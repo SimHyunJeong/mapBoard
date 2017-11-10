@@ -1,0 +1,73 @@
+﻿<HTML>
+	<HEAD>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+		<TITLE>SignUpPage</TITLE>
+	</HEAD>
+	
+	<BODY>
+		<div style="position : absolute; top : 30%; left : 25%; width : 50%;">	
+			<div class="ui middle aligned center aligned grid">
+				<div class="column">
+					<h2 class="ui teal image header">
+						<div class="content">
+							Sign-up
+						</div>
+					</h2>
+					<form id="signUpForm" class="ui large form" action="http://127.0.0.1:21002/signUpAction" method="post">						
+						<div class="ui stacked segment">
+							<div class="field">
+								<div class="ui left icon input">
+									<i class="user icon"></i>
+									<input type="text" name="id" placeholder="New ID" maxlength="20">
+								</div>
+							</div>
+							<div class="field">
+								<div class="ui left icon input">
+									<i class="lock icon"></i>
+									<input type="password" name="pw" placeholder="New Password" maxlength="20">
+								</div>
+							</div>
+							<div class="field">
+								<div class="ui left icon input">
+									<i class="lock icon"></i>
+									<input type="password" name="pwAgain" placeholder="New Password Again" maxlength="20">
+								</div>
+							</div>									
+							<div class="ui fluid large teal button" onclick="onSignUpClick();">
+								Sign-up
+							</div>
+						</div>
+					</form>
+					<div class="ui message">
+						<a href="/"> go to homepage </a>
+					</div>	
+				</div>
+			</div>
+		</div>
+	
+		<script>
+			function onSignUpClick(){
+				var form = document.getElementById("signUpForm");
+				var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/;
+
+				if(form.id.value == ""){
+					alert("id is empty");
+				}
+				else if(regExp.test(form.id.value)){
+					alert("can't use special character");
+				}
+				else if(form.pw.value == ""){
+					alert("password id empty");
+				}
+				else if(form.pw.value == form.pwAgain.value){
+					form.submit();
+				}
+				else{
+					alert("check your password");
+				}
+			}
+		</script>
+	</BODY>
+</HTML>

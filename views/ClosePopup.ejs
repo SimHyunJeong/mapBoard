@@ -1,0 +1,16 @@
+﻿<HTML>
+	<HEAD>
+		<TITLE>ClosePopup</TITLE>
+	</HEAD>
+	
+	<BODY>
+		<script>
+			if(window.opener){
+				window.close();
+			}
+			else{
+				location.href = '/contentListPage';
+			}
+		</script>
+	</BODY>
+</HTML>

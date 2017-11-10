@@ -1,0 +1,10 @@
+[
+    {
+      "hostName" : "127.0.0.1",
+      "sqlPort" : "3306",
+      "serverPort" : "21002",
+      "database" : "mapdb",
+      "user" : "mapuser",
+      "password" : "jkjkiii"
+    }
+  ]

@@ -1,0 +1,102 @@
+<HTML>
+	<HEAD>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>	
+	
+		<link href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" rel="stylesheet">
+		<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+		<TITLE>ContentPage</TITLE>
+	</HEAD>
+	
+	<BODY>
+		<div class="ui sidebar vertical menu">
+			<a id="userId" class="item"><%= user.id %></a>
+			<a class="item" href="./logOutAction">log-out</a>
+			<a class="item" href="./mapPage">map</a>
+			<a class="item" href="./contentListPage">contents</a>
+		</div>
+		<div class="pusher">
+			<div class="ui menu">
+				<div class="item" id="show-sidebar">
+					<a class="launch icon item">
+						<i class="content icon"></i>
+					</a>
+				</div> 
+			</div>
+		
+			<div class="ui segment" style="left : 5%; top : 5%; width : 90%; height : 800;">
+				<div class="ui form">	
+					<div class="field">
+
+						<form id="contentForm" action="http://127.0.0.1:21002/editContentPage" method="post">						
+							<input type="hidden" name="json" value="<%= JSON.stringify(content) %>">
+						</form>
+
+						<label>Title</label>
+						<label name="title" type="text"> <%= content.title %> </label>
+					</div>
+					<div class="ui inverted divider"></div>
+					
+					<div class="field">
+						<label>User</label>
+						<label name="user_id" type="text"> <%= content.user_id %> </label>
+					</div>
+					<div class="ui inverted divider"></div>
+					
+					<div class="field">
+						<label>Date</label>
+						<label type="text"> 
+							<% var datetime = new Date(content.datetime); %> 
+							<% var date = 
+								datetime.getFullYear() + "-" + 
+								(datetime.getMonth()*1 + 1) + "-" + 
+								datetime.getDate(); %>
+							<%= date %>
+						</label>
+					</div>
+					<div class="ui inverted divider"></div>
+
+					<div class="field">
+						<label>LatLng</label>
+						<label type="text"> 
+							Lat : <%= content.lat %> <br>
+							Lng : <%= content.lng %>
+						</label>
+					</div>
+					<div class="ui inverted divider"></div>
+					
+					<div class="field">
+						<label>Content</label>
+						<textarea readonly="true"  style="width : 100%; height : 100%;"><%= content.content %></textarea>
+					</div>
+
+					<input type="button" class="ui button" style="width : 30%" value="Edit" onclick="onEditClick();">	
+					<input type="button" class="ui button" style="width : 30%;" value="Back" onclick="onBackClick();">	
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			$('#show-sidebar').click(function(){
+				$('.ui.sidebar').sidebar('toggle');
+			});
+
+			function onBackClick(){
+				history.back();
+			}
+
+			function onEditClick(){
+				var form = document.getElementById("contentForm");
+				var userId = document.getElementById("userId");
+				
+				if("<%= content.user_id %>" == userId.innerHTML){
+					form.submit();
+				}
+				else{
+					alert("you can't edit this post");
+				}
+			}
+		</script>
+	</BODY>
+</HTML>

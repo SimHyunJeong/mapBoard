@@ -1,0 +1,97 @@
+<HTML>
+	<HEAD>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>	
+	
+		<link href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" rel="stylesheet">
+		<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+		<TITLE>EditContentPage</TITLE>
+	</HEAD>
+	
+	<BODY>
+		<div class="ui sidebar vertical menu">
+			<a id="userId" class="item"><%= user.id %></a>
+			<a class="item" href="./logOutAction">log-out</a>
+			<a class="item" href="./mapPage">map</a>
+			<a class="item" href="./contentListPage">contents</a>
+		</div>
+		<div class="pusher">
+			<a id="show-sidebar">
+				<i class="content icon"></i>
+			</a>  
+			<form id="contentForm" action="http://127.0.0.1:21002/editContentAction" method="post">						
+				<div class="ui segment" style="left : 5%; top : 5%; width : 90%; height : 800;">
+					<div class="ui form">	
+						<input name="content_idx" type="hidden">
+						
+						<div class="field">
+							<label>Title</label>
+							<input name="title" type="text">
+						</div>
+						<div class="ui inverted divider"></div>
+						
+						<div class="field">
+							<label>Lat</label>
+							<input name="lat" type="text">
+							<label>Lng</label>
+							<input name="lng" type="text">
+						</div>
+						<div class="ui inverted divider"></div>
+						
+						<div class="field">
+							<label>Content</label>
+							<textarea name="content" style="width : 100%; height : 100%;"></textarea>
+						</div>
+
+						<input type="button" class="ui button" style="width : 30%" value="Save" onclick="onSaveClick();">	
+						<input type="button" class="ui button" style="width : 30%" value="Delete" onclick="onDeleteClick();">	
+						<input type="button" class="ui button" style="width : 30%;" value="Back" onclick="onBackClick();">	
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<script type="text/javascript">
+			$('#show-sidebar').click(function(){
+				$('.ui.sidebar').sidebar('toggle');
+			});
+
+			var form = document.getElementById("contentForm");
+
+			form.title.value = "<%= content.title %>";
+			form.lat.value = "<%= content.lat %>";
+			form.lng.value = "<%= content.lng %>";
+			form.content.value = "<%= content.content %>";
+			form.title.value = "<%= content.title %>";
+			form.content_idx.value = "<%= content.content_idx %>";
+
+			function onBackClick(){
+				history.back();
+			}
+
+			function onDeleteClick(){
+				location.href = '/deleteContentAction' + '?idx=' + "<%= content.content_idx %>";
+			}
+
+			function onSaveClick(){
+				var regExp = /[`\'\"]/;
+
+				if(form.title.value == ""){
+					alert("title is empty");
+					return;
+				}
+				else if(form.lat.value == "" || form.lng.value == ""){
+					alert("lat or lng is empty");
+					return;
+				}
+				else if(regExp.test(form.title.value + form.content.value)){
+					alert("can't use special character");
+					return;
+				}
+
+				form.submit();
+			}
+		</script>
+	</BODY>
+</HTML>
