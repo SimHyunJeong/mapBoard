@@ -1,3 +1,5 @@
+var async = require("async");
+
 var sqlConnection;
 var request;
 var response;
@@ -12,6 +14,7 @@ var jsonPacket = {
 	lng : 0,
 	datetime : ""
 };
+
 exports.action = function(req, res, sqlConn)
 {
 	sqlConnection = sqlConn;
@@ -38,10 +41,128 @@ exports.action = function(req, res, sqlConn)
 				updateContent();
 				break;
 			}
+			case "COMMENT" : {
+				/*
+				async.waterfall( 
+					[ 
+						function(callback){ 
+							updateCommentsOrder(callback);							
+						}, 
+						function(isSuccess, callback){ 
+							if(isSuccess){ 
+								createComment(callback); 
+							} 
+						}, 
+						function(err){ 
+							if(err) console.log(err); 
+						} 
+					] 
+				); 
+				*/
+				selectComment();
+				break;
+			}
 		}
 	}
 	else{
 		loadContents();
+	}
+}
+
+function createComment(callback){
+	var sqlQuary = 'insert into comments' + 
+	'(p_content_idx, p_comment_idx, user_id, comment, depth, datetime, group_no, group_ord) ' + 
+	'values ?';
+
+	var p_content_idx = 177;
+	var p_comment_idx = 10;
+	var user_id = "test";
+	var comment = "t_comment 3-1";
+	var depth = 1;
+	var datetime = null;
+	var group_no = 3;
+	var group_ord = 0 + 1;
+
+	var values = [ 
+		[p_content_idx, 
+		p_comment_idx, 
+		user_id, 
+		comment, 
+		depth, 
+		datetime, 
+		group_no, 
+		group_ord] 
+	];
+
+	sqlConnection.query(sqlQuary, [values], (err, result) => {
+		createCommentAction(err, result, callback);
+	});
+}
+
+function createCommentAction(err, result, callback){
+	if(err) {
+		console.log("create error");
+		jsonPacket.command = "ERROR";
+		response.end(JSON.stringify(jsonPacket));
+		return;
+	}
+	if(result.affectedRows){
+		console.log("insert success");
+		jsonPacket.command = "SUCCESSFUL";
+		response.end(JSON.stringify(jsonPacket));		
+	}
+}
+
+function updateCommentsOrder(callback){
+	var group_no = 3;
+	var group_ord = 0;
+
+	var sqlQuary = 'update comments set group_ord=group_ord+1 where group_no = ' + group_no + ' and group_ord > ' + group_ord;
+
+	sqlConnection.query(sqlQuary, (err, result) => {
+		updateCommentsOrderAction(err, result, callback);
+	});
+}
+
+function updateCommentsOrderAction(err, result, callback){
+	if(err) {
+		console.log("update comments error");
+		jsonPacket.command = "ERROR";
+		response.end(JSON.stringify(jsonPacket));
+		return;
+	}
+	if(result.affectedRows){
+		console.log("update comments success");
+		callback(null, true);
+	}
+}
+
+function selectComment(){
+	var sqlQuary = "select * from comments where p_content_idx = 177 order by group_no, group_ord";
+	
+	sqlConnection.query(sqlQuary, (err, rows) => {
+		selectCommentAction(err, rows);
+	});
+}
+
+function selectCommentAction(err, rows){
+	if(err) {
+		console.log("select comments error");
+		jsonPacket.command = "ERROR";
+		response.end(JSON.stringify(jsonPacket));
+		return;
+	}
+	if(rows){
+		writeCommentsLog(rows);
+		console.log("select comments success");
+		jsonPacket.command = "SUCCESSFUL";
+		response.end(JSON.stringify(jsonPacket));
+	}
+}
+
+function writeCommentsLog(rows){
+	for(var i = 0; i < rows.length; i++){
+		console.log("comment_idx : " + rows[i].comment_idx);
 	}
 }
 

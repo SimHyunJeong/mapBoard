@@ -1,11 +1,19 @@
 <HTML>
 	<HEAD>
+		<!-- sementic ui -->
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
 		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>	
 	
+		<!-- leaflet.js -->
 		<link href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" rel="stylesheet">
 		<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+		
+		<!-- leaflet.markerCluster -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.2.0/MarkerCluster.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.2.0/MarkerCluster.Default.css" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.2.0/leaflet.markercluster-src.js"></script>	
+
 		<TITLE>MapPage</TITLE>
 	</HEAD>
 	
@@ -14,7 +22,6 @@
 			<a id="userId" name="userId" class="item"><%= user.id %></a>
 			<a id="logout" class="item" href="./logOutAction">log-out</a>
 			<a class="item" href="./mapPage">map</a>
-			<a class="item" href="./contentListPage">contents</a>
 		</div>
 		<div class="pusher">
 			<div class="ui menu">
@@ -41,13 +48,19 @@
 
 			// 기본 뷰 대한민국
 			//var map = L.map('map').setView([36.5, 127.5], 7);
+			
+			// 기본 뷰 전세계
 			var map = L.map('map').setView([0, 0], 1);
 
 			// 범위 지정 -- 안하면 지도가 반복적으로 나오지만 지도마다 좌표가 다르다
 			var boundStart = L.latLng(-85, -180);
 			var boundEnd = L.latLng(85, 180);
 			var myBounds = L.latLngBounds(boundStart, boundEnd);
-						
+			
+			// 마커 클러스터 : 마커 병합해서 숫자로 표시해주는 기능
+			var markers = new L.MarkerClusterGroup();
+			var markersList = [];
+			
 			L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 				attribution : '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 				bounds : myBounds,
@@ -58,14 +71,20 @@
 			map.on('mousemove', onMouseMove);
 			
 			var rows = JSON.parse('<%- JSON.stringify(contents) %>');
-						
+					
 			for(var i = 0; i < rows.length; i++){
 				var lat = rows[i].lat;
 				var lng = rows[i].lng;
 
-				var marker = L.marker(L.latLng(lat, lng)).addTo(map);
+				//var marker = L.marker(L.latLng(lat, lng)).addTo(map);
+				var marker = L.marker(L.latLng(lat, lng));
 				marker.on('click', onMarkerClick);
+
+				markersList.push(marker);
+				markers.addLayer(marker);
 			}
+
+			map.addLayer(markers);
 
 			function httpReqAndRes(msg, url) {
 				var req = getXmlHttpRequest();
@@ -135,7 +154,7 @@
 			}
 
 			function onMarkerClick(e){
-				var jsonPacket = {
+				var jsonPacketToContent = {
 					command : "",
 					content_idx : 0,
 					user_id : "",
@@ -146,36 +165,48 @@
 					datetime : ""
 				};
 				
-				jsonPacket.command = "SELECT";
-				jsonPacket.lat = e.latlng.lat;
-				jsonPacket.lng = e.latlng.lng;
+				jsonPacketToContent.command = "SELECT";
+				jsonPacketToContent.lat = e.latlng.lat;
+				jsonPacketToContent.lng = e.latlng.lng;
 				
-				var receive = httpReqAndRes(JSON.stringify(jsonPacket), '/mapAction');
+				var receiveToContent = httpReqAndRes(JSON.stringify(jsonPacketToContent), '/mapAction');
 				
-                if (receive.command != "SUCCESSFUL") {
+                if (receiveToContent.command != "SUCCESSFUL") {
 					alert("Something wrong on your post. Please contact to server manager.");
 					return;
 				}
 				
+				var jsonPacketToComment = receiveToContent;
+				jsonPacketToComment.command = "COMMENT";
+
+				var receiveToComment = httpReqAndRes(JSON.stringify(jsonPacketToComment), '/mapAction');
+				
+                if (receiveToComment.command != "SUCCESSFUL") {
+					alert("Something wrong on your post. Please contact to server manager.");
+					return;
+				}
+
 				popup.setLatLng(e.latlng);
 
+								
+				/*
 				var popupHTML = '<strong>Idx : </strong>' + 
-								'<label id="popup_idx">' + receive.content_idx + '</label>' + 
+								'<label id="popup_idx">' + receiveToContent.content_idx + '</label>' + 
 								'</br>' + 
 								'<strong>Title : </strong>' + 
-								'<label id="popup_title">' + receive.title + '</label>' + 
+								'<label id="popup_title">' + receiveToContent.title + '</label>' + 
 								'</br>' + 
 								'<strong>User : </strong>' + 
-								'<label id="popup_id">' + receive.user_id + '</label>' + 
+								'<label id="popup_id">' + receiveToContent.user_id + '</label>' + 
 								'</br></br>' + 
 								'<strong>Content</strong>' + 
 								'</br>' + 
-								'<div id="popup_content" style="overflow:auto; width:300px; height:75px;">' + receive.content + '</div>' + 
+								'<div id="popup_content" style="overflow:auto; width:300px; height:75px;">' + receiveToContent.content + '</div>' + 
 								'</br>' + 
 								'<strong>Updated time : </strong>' + 
-								'<label id="popup_datetime">' + receive.datetime + '</label>';
+								'<label id="popup_datetime">' + receiveToContent.datetime + '</label>';
 
-                if (document.getElementById("userId").innerHTML == receive.user_id) {
+                if (document.getElementById("userId").innerHTML == receiveToContent.user_id) {
 					popupHTML += '</br></br>' + 
 								'<button type="button" style="width : 30%;" onclick="onPopupEditClick()" class="ui primary button">Edit</button>' + 
 								'<button type="button" style="width : 30%;" onclick="onPopupDeleteClick()" class="ui secondary button">Delete</button>' + 
@@ -185,12 +216,19 @@
 					popupHTML += '</br></br>' + 
 								'<button type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">Close</button>'
 				}
-				
-                popup.setContent(popupHTML);
+				*/
 
-                popup.openOn(map);
+				$.get("/mapPage").done(function(data){
+					popup.setContent(data);
+					popup.openOn(map);
+				});
+
 			}
 			
+			function showContentPage(){
+				location.href = "/mapPage";
+			}
+
 			function onPopupSaveClick() { 
 				var jsonPacket = {
 					command : "",
