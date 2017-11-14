@@ -36,5 +36,11 @@ module.exports = function(app, sqlConnection)
 		var model = require('../models/MapActionModel.js');	
 		model.action(request, response, sqlConnection);
 	});
+
+	app.post('/contentPage', function(request, response){
+		var model = require('../models/ContentActionModel.js');	
+		model.action(request, response, sqlConnection);
+		console.log('/contentPage');
+	})
 }
 

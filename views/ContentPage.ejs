@@ -1,0 +1,27 @@
+<HTML>
+    <HEAD>
+        <TITLE>ContentPage</TITLE>
+    </HEAD>
+    <BODY>
+        <strong>Idx : </strong>
+        <label id="popup_idx"><%= row.content_idx %></label>
+        </br>
+
+        <strong>Title : </strong>
+        <label id="popup_title"><%= row.title %></label>
+        </br>
+
+        <strong>User : </strong>
+        <label id="popup_id"><%= row.user_id %></label>
+        </br></br>
+
+        <strong>Content</strong>
+        </br>
+        <div id="popup_content" style="overflow:auto; width:300px; height:75px;"><%= row.content %></div>
+        </br>
+        
+        <strong>Updated time</strong>
+        </br>
+        <label id="popup_datetime"><%= row.datetime %></label>
+    </BODY>
+</HTML>

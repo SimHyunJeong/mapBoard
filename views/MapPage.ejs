@@ -218,16 +218,29 @@
 				}
 				*/
 
-				$.get("/mapPage").done(function(data){
-					popup.setContent(data);
-					popup.openOn(map);
-				});
+				var uid = document.getElementById("userId").innerHTML;
+				
+				var popupHTML = "";
 
+				$.post("/contentPage", {user_id : uid, lat : e.latlng.lat, lng : e.latlng.lng}).done(function(data){
+					popupHTML = data;
+					if (document.getElementById("userId").innerHTML == receiveToContent.user_id) {
+						popupHTML += '</br></br>' + 
+									'<button type="button" style="width : 30%;" onclick="onPopupEditClick()" class="ui primary button">Edit</button>' + 
+									'<button type="button" style="width : 30%;" onclick="onPopupDeleteClick()" class="ui secondary button">Delete</button>' + 
+									'<button type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">Close</button>';
+					}
+					else {
+						popupHTML += '</br></br>' + 
+									'<button type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">Close</button>'
+					}
+					popup.setContent(popupHTML);
+				});
+				
+				popup.setContent(popupHTML);
+				popup.openOn(map);
 			}
 			
-			function showContentPage(){
-				location.href = "/mapPage";
-			}
 
 			function onPopupSaveClick() { 
 				var jsonPacket = {
@@ -331,11 +344,11 @@
 					'<strong>idx : </strong>' + 
 					'<label id="popup_edit_idx"></label>' +
 					'</br>' + 
-					'<strong>Title : </strong>' + 
+					'<strong>Title</strong>' + 
 					'</br>' + 
 					'<input style="width : 100%;" type="text" id="popup_edit_title" maxLength="40" size="40" name="id" value="">' + 
 					'</br></br>' + 
-					'<strong>Context : </strong>' + 
+					'<strong>Context</strong>' + 
 					'</br>' + 
 					'<textarea style="overflow:auto; width:300px; height:75px;" name="textarea" id="popup_edit_content" rows="5" cols="40"></textarea>' + 
 					'</br></br>' + 
@@ -351,7 +364,5 @@
 				popup.openOn(map);
 			}
 		</script>
-
-		<script src="./MapPage.js"></script>
 	</BODY>
 </HTML>
