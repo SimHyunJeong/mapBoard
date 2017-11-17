@@ -1,6 +1,6 @@
 <HTML>
     <HEAD>
-        <TITLE>ContentPage</TITLE>
+        <TITLE>CreateContentPopup</TITLE>
     </HEAD>
     <BODY>
         <strong>Idx : </strong>
@@ -23,5 +23,11 @@
         <strong>Updated time</strong>
         </br>
         <label id="popup_datetime"><%= row.datetime %></label>
+        </br></br>
+        
+        <input type="hidden" id="edit_button" value="Edit" style="width : 30%;" onclick="onPopupEditClick()" class="ui primary button">
+        <input type="hidden" id="delete_button" value="Delete" style="width : 30%;" onclick="onPopupDeleteClick()" class="ui secondary button">
+        <input type="button" id="close_button" value="Close" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">
+
     </BODY>
 </HTML>

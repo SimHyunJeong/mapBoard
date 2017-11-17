@@ -1,0 +1,23 @@
+<HTML>
+    <HEAD>
+        <TITLE>EditContentPopup</TITLE>
+    </HEAD>
+    <BODY>
+        <strong>idx : </strong>
+        <label id="popup_edit_idx"></label>
+        </br>
+
+        <strong>Title</strong>
+        </br>
+        <input style="width : 100%;" type="text" id="popup_edit_title" maxLength="40" size="40" name="id" value="">
+        </br></br>
+
+        <strong>Context</strong>
+        </br>
+        <textarea style="overflow:auto; width:300px; height:75px;" name="textarea" id="popup_edit_content" rows="5" cols="40"></textarea>
+        </br></br>
+        
+        <input type="button" style="width : 30%;" onclick="onPopupUpdateClick()" class="ui primary button" value="Update">
+        <input type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button" value="Close">
+    </BODY>
+</HTML>

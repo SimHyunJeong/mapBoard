@@ -25,7 +25,7 @@
 		</div>
 		<div class="pusher">
 			<div class="ui menu">
-				<div class="item" id="show-sidebar">
+				<div class="item" id="show_sidebar">
 					<a class="launch icon item">
 						<i class="content icon"></i>
 					</a>
@@ -42,13 +42,10 @@
 
 		
 		<script type="text/javascript">
-			$('#show-sidebar').click(function(){
+			$('#show_sidebar').click(function(){
 				$('.ui.sidebar').sidebar('toggle');
 			});
 
-			// 기본 뷰 대한민국
-			//var map = L.map('map').setView([36.5, 127.5], 7);
-			
 			// 기본 뷰 전세계
 			var map = L.map('map').setView([0, 0], 1);
 
@@ -86,13 +83,33 @@
 
 			map.addLayer(markers);
 
+			var jsonPacket = {
+				command : "",
+				content_idx : 0,
+				user_id : "",
+				title : "",
+				content : "",
+				lat : 0,
+				lng : 0,
+				datetime : ""
+			};
+
 			function httpReqAndRes(msg, url) {
 				var req = getXmlHttpRequest();
 				req.open('post', url, false);
 				req.setRequestHeader('Content-Type', 'application/json');
 				req.send(msg);
+				
+				var resText = req.responseText;
+				var resJson;
 
-				return JSON.parse(req.responseText);
+				try{
+					resJson = JSON.parse(req.responseText);
+					return resJson;
+				}
+				catch(exception){
+					return resText;
+				}
 			}
 			
 			function getXmlHttpRequest(){
@@ -136,124 +153,48 @@
 				}
 
 				popup.setLatLng(e.latlng);
-				popup.setContent(
-					'<strong>Title : </strong>' + 
-					'</br>' + 
-					'<input style="width : 100%;" type="text" id="title" maxLength="40" size="40" name="id" value="">' + 
-					'</br></br>' + 
-					'<strong>Context : </strong>' + 
-					'</br>' + 
-					'<textarea style="overflow:auto; width:300px; height:75px;" name="textarea" id="content" rows="5" cols="40"></textarea>' + 
-					'</br></br>' + 
-					'<input type="button" style="width : 30%;" onclick="onPopupSaveClick()" class="ui primary button" value="Save">' + 
-					'<input type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button" value="Close">', 
-					{ closeOnClick: false }
-				)
 
+				$.get("/createContentPage").done(function(data){
+					popup.setContent(data);
+				});
+				
 				popup.openOn(map);
 			}
 
 			function onMarkerClick(e){
-				var jsonPacketToContent = {
-					command : "",
-					content_idx : 0,
-					user_id : "",
-					title : "",
-					content : "",
-					lat : 0,
-					lng : 0,
-					datetime : ""
-				};
-				
-				jsonPacketToContent.command = "SELECT";
-				jsonPacketToContent.lat = e.latlng.lat;
-				jsonPacketToContent.lng = e.latlng.lng;
-				
-				var receiveToContent = httpReqAndRes(JSON.stringify(jsonPacketToContent), '/mapAction');
-				
-                if (receiveToContent.command != "SUCCESSFUL") {
-					alert("Something wrong on your post. Please contact to server manager.");
-					return;
-				}
-				
-				var jsonPacketToComment = receiveToContent;
-				jsonPacketToComment.command = "COMMENT";
+				initPacket();
 
-				var receiveToComment = httpReqAndRes(JSON.stringify(jsonPacketToComment), '/mapAction');
+				jsonPacket.command = "SELECT";
+				jsonPacket.lat = e.latlng.lat;
+				jsonPacket.lng = e.latlng.lng;
 				
-                if (receiveToComment.command != "SUCCESSFUL") {
-					alert("Something wrong on your post. Please contact to server manager.");
-					return;
-				}
-
+				var receive = httpReqAndRes(JSON.stringify(jsonPacket), '/mapAction');
+				
 				popup.setLatLng(e.latlng);
-
-								
-				/*
-				var popupHTML = '<strong>Idx : </strong>' + 
-								'<label id="popup_idx">' + receiveToContent.content_idx + '</label>' + 
-								'</br>' + 
-								'<strong>Title : </strong>' + 
-								'<label id="popup_title">' + receiveToContent.title + '</label>' + 
-								'</br>' + 
-								'<strong>User : </strong>' + 
-								'<label id="popup_id">' + receiveToContent.user_id + '</label>' + 
-								'</br></br>' + 
-								'<strong>Content</strong>' + 
-								'</br>' + 
-								'<div id="popup_content" style="overflow:auto; width:300px; height:75px;">' + receiveToContent.content + '</div>' + 
-								'</br>' + 
-								'<strong>Updated time : </strong>' + 
-								'<label id="popup_datetime">' + receiveToContent.datetime + '</label>';
-
-                if (document.getElementById("userId").innerHTML == receiveToContent.user_id) {
-					popupHTML += '</br></br>' + 
-								'<button type="button" style="width : 30%;" onclick="onPopupEditClick()" class="ui primary button">Edit</button>' + 
-								'<button type="button" style="width : 30%;" onclick="onPopupDeleteClick()" class="ui secondary button">Delete</button>' + 
-								'<button type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">Close</button>';
-				}
-                else {
-					popupHTML += '</br></br>' + 
-								'<button type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">Close</button>'
-				}
-				*/
-
-				var uid = document.getElementById("userId").innerHTML;
-				
-				var popupHTML = "";
-
-				$.post("/contentPage", {user_id : uid, lat : e.latlng.lat, lng : e.latlng.lng}).done(function(data){
-					popupHTML = data;
-					if (document.getElementById("userId").innerHTML == receiveToContent.user_id) {
-						popupHTML += '</br></br>' + 
-									'<button type="button" style="width : 30%;" onclick="onPopupEditClick()" class="ui primary button">Edit</button>' + 
-									'<button type="button" style="width : 30%;" onclick="onPopupDeleteClick()" class="ui secondary button">Delete</button>' + 
-									'<button type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">Close</button>';
-					}
-					else {
-						popupHTML += '</br></br>' + 
-									'<button type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">Close</button>'
-					}
-					popup.setContent(popupHTML);
-				});
-				
-				popup.setContent(popupHTML);
+				popup.setContent(receive);
 				popup.openOn(map);
+				
+				var uid = document.getElementById("userId").innerHTML;
+				var author = document.getElementById("popup_id").innerHTML;
+				
+				if (uid == author) {
+					document.getElementById("edit_button").type = 'button';
+					document.getElementById("delete_button").type = 'button';
+				}
+
+				jsonPacket.command = "COMMENT";
+				jsonPacket.content_idx = document.getElementById('popup_idx').innerHTML;
+
+				var receive = httpReqAndRes(JSON.stringify(jsonPacket), '/mapAction');
+
+				var html = popup.getContent();
+				popup.setContent(html + receive);
 			}
 			
 
 			function onPopupSaveClick() { 
-				var jsonPacket = {
-					command : "",
-					content_idx : 0,
-					user_id : "",
-					title : "",
-					content : "",
-					lat : 0,
-					lng : 0,
-					datetime : ""
-				};
-
+				initPacket();
+				
 				jsonPacket.command = "INSERT";
 				jsonPacket.user_id = document.getElementById("userId").innerHTML;
 				jsonPacket.title = document.getElementById('title').value;
@@ -278,16 +219,7 @@
 			}
 			
 			function onPopupDeleteClick() {
-				var jsonPacket = {
-					command : "",
-					content_idx : 0,
-					user_id : "",
-					title : "",
-					content : "",
-					lat : 0,
-					lng : 0,
-					datetime : ""
-				};
+				initPacket();
 
 				jsonPacket.command = "DELETE";
 				jsonPacket.content_idx = document.getElementById("popup_idx").innerHTML;
@@ -305,23 +237,12 @@
 			}
 			
 			function onPopupUpdateClick(){
-				var jsonPacket = {
-					command : "",
-					content_idx : 0,
-					user_id : "",
-					title : "",
-					content : "",
-					lat : 0,
-					lng : 0,
-					datetime : ""
-				};
-
+				initPacket();
 
 				jsonPacket.command = "UPDATE";
 				jsonPacket.title = document.getElementById('popup_edit_title').value;
 				jsonPacket.content = document.getElementById('popup_edit_content').value;
 				jsonPacket.content_idx = document.getElementById("popup_edit_idx").innerHTML;
-
 
 				var receive = httpReqAndRes(JSON.stringify(jsonPacket), '/mapAction');
 
@@ -340,28 +261,28 @@
 				var content = document.getElementById("popup_content").innerHTML;
 				var content_idx = document.getElementById("popup_idx").innerHTML;
 
-				popup.setContent(
-					'<strong>idx : </strong>' + 
-					'<label id="popup_edit_idx"></label>' +
-					'</br>' + 
-					'<strong>Title</strong>' + 
-					'</br>' + 
-					'<input style="width : 100%;" type="text" id="popup_edit_title" maxLength="40" size="40" name="id" value="">' + 
-					'</br></br>' + 
-					'<strong>Context</strong>' + 
-					'</br>' + 
-					'<textarea style="overflow:auto; width:300px; height:75px;" name="textarea" id="popup_edit_content" rows="5" cols="40"></textarea>' + 
-					'</br></br>' + 
-					'<input type="button" style="width : 30%;" onclick="onPopupUpdateClick()" class="ui primary button" value="Update">' + 
-					'<input type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button" value="Close">', 
-					{ closeOnClick: false }
-				)
+				$.get("/editContentPage").done(function(data){
+					popup.setContent(data);
+					document.getElementById("popup_edit_title").value = title;
+					document.getElementById("popup_edit_content").value = content;
+					document.getElementById("popup_edit_idx").innerHTML = content_idx;
+				});
 
-				document.getElementById("popup_edit_title").value = title;
-				document.getElementById("popup_edit_content").value = content;
-				document.getElementById("popup_edit_idx").innerHTML = content_idx;
 
 				popup.openOn(map);
+			}
+
+			function initPacket(){
+				jsonPacket = {
+					command : "",
+					content_idx : 0,
+					user_id : "",
+					title : "",
+					content : "",
+					lat : 0,
+					lng : 0,
+					datetime : ""
+				};
 			}
 		</script>
 	</BODY>

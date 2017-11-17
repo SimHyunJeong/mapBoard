@@ -138,7 +138,7 @@ function updateCommentsOrderAction(err, result, callback){
 }
 
 function selectComment(){
-	var sqlQuary = "select * from comments where p_content_idx = 177 order by group_no, group_ord";
+	var sqlQuary = "select * from comments where p_content_idx = " + request.body.content_idx + " order by group_no, group_ord";
 	
 	sqlConnection.query(sqlQuary, (err, rows) => {
 		selectCommentAction(err, rows);
@@ -153,17 +153,28 @@ function selectCommentAction(err, rows){
 		return;
 	}
 	if(rows){
-		writeCommentsLog(rows);
-		console.log("select comments success");
-		jsonPacket.command = "SUCCESSFUL";
-		response.end(JSON.stringify(jsonPacket));
+		response.end(makeCommentsHtml(rows));
 	}
 }
 
-function writeCommentsLog(rows){
+function makeCommentsHtml(rows){
+	var html = "<br><br><br>";
+
 	for(var i = 0; i < rows.length; i++){
-		console.log("comment_idx : " + rows[i].comment_idx);
+		for(var j = 0; j < rows[i].depth; j++){
+			if(j == rows[i].depth-1){
+				html += "└";
+			}
+			html += "&nbsp&nbsp&nbsp";
+		}
+		html += rows[i].user_id + " : ";
+		html += rows[i].comment;
+		html += "<br>";
+
+		//console.log("comment_idx : " + rows[i].comment_idx);
 	}
+
+	return html;
 }
 
 function loadContents() {
@@ -216,18 +227,12 @@ function selectContentAction(err, rows){
 		return;
 	}
 	if(rows){
-		jsonPacket.content_idx = rows[0].content_idx;
-		jsonPacket.user_id = rows[0].user_id;
-		jsonPacket.title = rows[0].title;
-		jsonPacket.content = rows[0].content;
-		jsonPacket.lat = rows[0].lat;
-		jsonPacket.lng = rows[0].lng;
-		jsonPacket.datetime = rows[0].datetime;
-
 		console.log("select success");
-		jsonPacket.command = "SUCCESSFUL";
-		response.end(JSON.stringify(jsonPacket));
-	}
+		//jsonPacket.command = "SUCCESSFUL";
+		//response.end(JSON.stringify(jsonPacket));
+		response.render('ContentPopups/ShowContentPopup.ejs', {
+			row : rows[0]
+		});	}
 }
 
 function createContent() {

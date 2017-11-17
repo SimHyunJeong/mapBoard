@@ -1,8 +1,6 @@
 var sqlConnection; 
 var request; 
 var response; 
-var page; 
-var maxContentsLength; 
 
 exports.action = function(req, res, sqlConn) 
 { 
@@ -25,7 +23,6 @@ function loadContent() {
 	}); 
 } 
 
-
 function loadContentAction(err, rows){ 
 	if(err) {
 		request.session.ERRORMESSAGE = "load content error";
@@ -33,7 +30,7 @@ function loadContentAction(err, rows){
 		return;
 	}	
 	if(rows) {
-		response.render('ContentPage.ejs', {
+		response.render('ContentPopups/ShowContentPopup.ejs', {
 			row : rows[0]
 		});
 	}

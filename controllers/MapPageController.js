@@ -37,10 +37,21 @@ module.exports = function(app, sqlConnection)
 		model.action(request, response, sqlConnection);
 	});
 
-	app.post('/contentPage', function(request, response){
+	
+	app.get('/createContentPage', function(request, response){
+		response.render('ContentPopups/CreateContentPopup.ejs');
+		console.log("/createContentPage");
+	});
+
+	app.get('/editContentPage', function(request, response){
+		response.render('ContentPopups/EditContentPopup.ejs');
+		console.log("/editContentPage");
+	});
+
+	app.post('/showContentPage', function(request, response){
 		var model = require('../models/ContentActionModel.js');	
 		model.action(request, response, sqlConnection);
-		console.log('/contentPage');
-	})
+		console.log('/showContentPage');
+	});
 }
 
