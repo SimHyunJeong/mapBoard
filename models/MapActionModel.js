@@ -227,29 +227,9 @@ function selectCommentAction(err, rows){
 			request.session.LAST_COMMENT_G_NO = lastGroupNo;			
 		}
 		response.end(JSON.stringify(rows));
-		//response.end(makeCommentsHtml(rows));
 	}
 }
 
-function makeCommentsHtml(rows){
-	var html = "<br><br><br>";
-
-	for(var i = 0; i < rows.length; i++){
-		for(var j = 0; j < rows[i].depth; j++){
-			if(j == rows[i].depth-1){
-				html += "└";
-			}
-			html += "&nbsp&nbsp&nbsp";
-		}
-		html += rows[i].user_id + " : ";
-		html += rows[i].comment;
-		html += "<br>";
-
-		//console.log("comment_idx : " + rows[i].comment_idx);
-	}
-
-	return html;
-}
 
 function loadContents() {
 	var sqlQuary = "select lat, lng from contents ";
@@ -336,6 +316,7 @@ function createContentAction(err, result){
 	if(result.affectedRows){
 		console.log("insert success");
 		jsonPacket.command = "SUCCESSFUL";
+		jsonPacket.content_idx = result.insertId;
 		response.end(JSON.stringify(jsonPacket));		
 	}
 }

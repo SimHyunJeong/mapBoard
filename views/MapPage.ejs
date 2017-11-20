@@ -249,11 +249,32 @@
 				jsonPacket.content = document.getElementById('content').value;
 				jsonPacket.lat = popup.getLatLng().lat;
 				jsonPacket.lng = popup.getLatLng().lng;
-
+				
 				var receive = httpReqAndRes(JSON.stringify(jsonPacket), '/mapAction');
 
                 if (receive.command == "SUCCESSFUL") {
-                    alert("Your post has been Saved successfully.");
+					var form = document.getElementById('fileupload');
+					var formData = new FormData(form);
+					formData.append('p_content_idx', receive.content_idx);
+					$.ajax({
+						type: "POST",
+						enctype: 'multipart/form-data',
+						url: "/upload",
+						data: formData,
+						processData: false,
+						contentType: false,
+						cache: false,
+						timeout: 600000,
+						success: function (data) {
+							console.log("SUCCESS : ", data);
+						},
+						error: function (e) {
+							console.log("ERROR : ", e);
+						}
+					});
+
+					alert("Your post has been Saved successfully.");
+					
                 }
                 else {
                     alert("Something wrong on your post. Please contact to server manager.");
@@ -376,6 +397,7 @@
 					datetime : ""
 				};
 			}
+
 		</script>
 	</BODY>
 </HTML>

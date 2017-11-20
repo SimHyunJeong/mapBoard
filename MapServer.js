@@ -4,6 +4,7 @@ var express = require('express');
 var mysql = require('mysql');
 var session = require('express-session');
 var jsonFile = require('jsonFile');
+var multer = require('multer');
 
 // --- setting 불러오기
 var fileName = './setting.json';
@@ -27,6 +28,21 @@ mySqlConnection.connect(err => {
 	if(err) throw new Error(err);
 });
 
+// --- multer 설정
+/*
+var storage = multer.diskStorage({
+	destination : 'uploads/',
+	filename : function(req, file, callback){
+		callback(null, file.originalname);
+	}
+});
+*/
+var upload = multer({ 
+	//storage : storage,
+	dest : 'uploads/', 
+	limits : { fileSize: 5 * 1024 * 1024 } 
+});
+
 // --- 모듈 설정
 var app = express();
 
@@ -35,9 +51,9 @@ app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit : '10mb'}));
 
-// --- 세션 설정
+// --- session 설정
 app.use(session({
 	secret: '@#@$q1w2e3r4#@$#$',
 	resave: false,
@@ -51,7 +67,7 @@ app.use(function(request, response, next){
 });
 
 // --- 라우터 설정
-var router = require('./Index')(app, mySqlConnection);
+var router = require('./Index')(app, mySqlConnection, upload);
 
 // --- 서버 실행
 app.listen(serverPort, function(){

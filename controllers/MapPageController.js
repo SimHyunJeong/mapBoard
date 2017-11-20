@@ -1,4 +1,4 @@
-module.exports = function(app, sqlConnection)
+module.exports = function(app, sqlConnection, upload)
 {
   	app.get('/mapPage', function(request, response){
 		response.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
@@ -36,7 +36,11 @@ module.exports = function(app, sqlConnection)
 		var model = require('../models/MapActionModel.js');	
 		model.action(request, response, sqlConnection);
 	});
-
+	app.post('/upload', upload.single('filename'), function(request, response){
+		var model = require('../models/UploadActionModel.js');	
+		model.action(request, response, sqlConnection);
+		//res.download('uploads/' + req.file.filename);
+	});
 	
 	app.get('/createContentPage', function(request, response){
 		response.render('ContentPopups/CreateContentPopup.ejs');
