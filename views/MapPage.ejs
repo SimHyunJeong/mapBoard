@@ -50,20 +50,25 @@
 			var map = L.map('map').setView([0, 0], 1);
 
 			// 범위 지정 -- 안하면 지도가 반복적으로 나오지만 지도마다 좌표가 다르다
-			var boundStart = L.latLng(-85, -180);
-			var boundEnd = L.latLng(85, 180);
-			var myBounds = L.latLngBounds(boundStart, boundEnd);
+			var layerBoundStart = L.latLng(-85, -180);
+			var layerBoundEnd = L.latLng(85, 180);
+			var layerBounds = L.latLngBounds(layerBoundStart, layerBoundEnd);
 			
+			//var mapBoundStart = L.latLng(-10000, -500);
+			//var mapBoundEnd = L.latLng(10000, 500);
+			//var mapBounds = L.latLngBounds(mapBoundStart, mapBoundEnd);
+
 			// 마커 클러스터 : 마커 병합해서 숫자로 표시해주는 기능
 			var markers = new L.MarkerClusterGroup();
 			var markersList = [];
 			
 			L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 				attribution : '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-				bounds : myBounds,
+				bounds : layerBounds,
 				minZoom : 1
 			}).addTo(map);
 
+			//map.setMaxBounds(mapBounds);
 			map.on('click', onMapClick);
 			map.on('mousemove', onMouseMove);
 			
@@ -176,7 +181,7 @@
 				
 				var uid = document.getElementById("userId").innerHTML;
 				var author = document.getElementById("popup_id").innerHTML;
-				
+
 				if (uid == author) {
 					document.getElementById("edit_button").type = 'button';
 					document.getElementById("delete_button").type = 'button';
@@ -185,12 +190,55 @@
 				jsonPacket.command = "COMMENT";
 				jsonPacket.content_idx = document.getElementById('popup_idx').innerHTML;
 
-				var receive = httpReqAndRes(JSON.stringify(jsonPacket), '/mapAction');
+				var rows = httpReqAndRes(JSON.stringify(jsonPacket), '/mapAction');
 
 				var html = popup.getContent();
-				popup.setContent(html + receive);
+				popup.setContent(html + makeCommentsHtml(rows));
+
+				if (uid == author) {
+					document.getElementById("edit_button").type = 'button';
+					document.getElementById("delete_button").type = 'button';
+				}
 			}
-			
+
+			function makeCommentsHtml(rows){
+				if(rows.length == 0){
+					return "";
+				}
+				var html = '<br>';
+				
+				html += '<div style="padding : 15px; border : 1px solid black; overflow : scroll; height : 150px;">';
+				for(var i = 0; i < rows.length; i++){
+					html += '<div id="' + rows[i].comment_idx + '" ' + 
+							'onclick="onCommentClick(this)">';
+					html += '<input id="group_no" type="hidden" value="' + rows[i].group_no + '"/>';
+					html += '<label>';
+
+					for(var j = 0; j < rows[i].depth; j++){
+						if(j == rows[i].depth-1){
+							html += '└';
+						}
+						html += '&nbsp&nbsp&nbsp';
+					}
+					html += rows[i].user_id + ' : ';
+					html += rows[i].comment;
+					html += '</label>';
+					html += '<div style="text-align : right;">';
+					html += rows[i].datetime;
+					html += '</div>';
+					html += '<textarea id="comments_comment' + rows[i].comment_idx + 
+					'" style="display:none; overflow:auto; width:60%; height:20px;" maxlength="99"></textarea>' + 
+					'<input type="hidden" id="comments_write_button' + rows[i].comment_idx + '" ' + 
+					'value="Write" style="width : 30%;" onclick="onPopupWriteClick(2, this)" class="ui primary button">' + 
+					'<br>';
+					html += '</div>';
+
+					//console.log("comment_idx : " + rows[i].comment_idx);
+				}
+				html += '</div>';
+
+				return html;
+			}
 
 			function onPopupSaveClick() { 
 				initPacket();
@@ -268,8 +316,52 @@
 					document.getElementById("popup_edit_idx").innerHTML = content_idx;
 				});
 
-
 				popup.openOn(map);
+			}
+
+			function onPopupWriteClick(check, clickedObj){
+				var commentPacket = {
+					command : "",
+					p_content_idx : 0,
+					p_comment_idx : null,
+					user_id : "",
+					comment : "",
+					depth : "",
+					group_no : null
+				};				
+
+				if(check == 1){
+					commentPacket.command = "CREATE_COMMENT";
+					commentPacket.p_content_idx = document.getElementById("popup_idx").innerHTML;
+					commentPacket.user_id = document.getElementById("userId").innerHTML;
+					commentPacket.comment = document.getElementById('popup_comment').value;
+					commentPacket.depth = 0;
+				}
+				else if(check == 2){
+					commentPacket.command = "CREATE_COMMENT";
+					commentPacket.p_content_idx = document.getElementById("popup_idx").innerHTML;
+					commentPacket.user_id = document.getElementById("userId").innerHTML;
+					commentPacket.comment = document.getElementById('comments_comment' + clickedObj.parentNode.id).value;
+					commentPacket.depth = 1;
+					commentPacket.group_no = clickedObj.parentNode.firstChild.value;
+				}
+				
+				var receive = httpReqAndRes(JSON.stringify(commentPacket), '/mapAction');
+
+				if (receive.command == "SUCCESSFUL") {
+                    alert("Your post has been Saved successfully.");
+                }
+                else {
+                    alert("Something wrong on your post. Please contact to server manager.");
+				}
+
+				location.reload();
+			}
+
+			function onCommentClick(clickedObj){
+				//alert(clickedObj.id);
+				document.getElementById('comments_comment' + clickedObj.id).style.display = "block";
+				document.getElementById('comments_write_button' + clickedObj.id).type = "button";
 			}
 
 			function initPacket(){

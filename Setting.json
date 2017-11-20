@@ -1,6 +1,6 @@
 [
     {
-      "hostName" : "127.0.0.1",
+      "hostName" : "192.168.0.181",
       "sqlPort" : "3306",
       "serverPort" : "21002",
       "database" : "mapdb",

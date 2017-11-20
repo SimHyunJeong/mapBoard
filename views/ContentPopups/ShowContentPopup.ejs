@@ -5,29 +5,36 @@
     <BODY>
         <strong>Idx : </strong>
         <label id="popup_idx"><%= row.content_idx %></label>
-        </br>
+        <br>
 
         <strong>Title : </strong>
         <label id="popup_title"><%= row.title %></label>
-        </br>
+        <br>
 
         <strong>User : </strong>
         <label id="popup_id"><%= row.user_id %></label>
-        </br></br>
+        <br><br>
 
         <strong>Content</strong>
-        </br>
+        <br>
         <div id="popup_content" style="overflow:auto; width:300px; height:75px;"><%= row.content %></div>
-        </br>
+        <br>
         
         <strong>Updated time</strong>
-        </br>
+        <br>
         <label id="popup_datetime"><%= row.datetime %></label>
-        </br></br>
+        <br><br>
         
         <input type="hidden" id="edit_button" value="Edit" style="width : 30%;" onclick="onPopupEditClick()" class="ui primary button">
         <input type="hidden" id="delete_button" value="Delete" style="width : 30%;" onclick="onPopupDeleteClick()" class="ui secondary button">
         <input type="button" id="close_button" value="Close" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">
+        <br><br>
+    
+        <strong>Comments</strong>
+        <br>
+        <textarea id="popup_comment" style="overflow:auto; width:60%; height:20px;" maxlength="99"></textarea>
+        <input type="button" id="write_button" value="Write" style="width : 30%;" onclick="onPopupWriteClick(1, this)" class="ui primary button">
+        <br>
 
     </BODY>
 </HTML>

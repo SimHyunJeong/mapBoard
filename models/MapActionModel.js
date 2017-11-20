@@ -25,19 +25,19 @@ exports.action = function(req, res, sqlConn)
 
 	if(request.body.command != undefined) {
 		switch(request.body.command){
-			case "SELECT": {
+			case "SELECT" : {
 				selectContent();				
 				break;
 			}
-			case "INSERT": {
+			case "INSERT" : {
 				createContent();
 				break;
 			}
-			case "DELETE": {
+			case "DELETE" : {
 				deleteContent(request.body.content_idx);
 				break;
 			}
-			case "UPDATE": {
+			case "UPDATE" : {
 				updateContent();
 				break;
 			}
@@ -62,6 +62,10 @@ exports.action = function(req, res, sqlConn)
 				selectComment();
 				break;
 			}
+			case "CREATE_COMMENT" : {
+				createComment();
+				break;
+			}
 		}
 	}
 	else{
@@ -69,6 +73,67 @@ exports.action = function(req, res, sqlConn)
 	}
 }
 
+function createComment(){
+	var sqlQuary = 'insert into comments' + 
+	'(p_content_idx, p_comment_idx, user_id, comment, depth, datetime, group_no, group_ord) ' + 
+	'values ?';
+
+	var p_content_idx = request.body.p_content_idx;
+	var p_comment_idx = request.body.p_comment_idx;
+	var user_id = request.body.user_id;
+	var comment = request.body.comment;
+	var depth = request.body.depth;
+	var datetime = new Date();
+	var group_no = request.session.LAST_COMMENT_G_NO + 1;
+	var group_ord = 0;
+
+	console.log("group_no : " + request.body.group_no);
+	console.log("depth : " + request.body.depth);
+	
+	if(request.body.group_no != null){
+		group_no = request.body.group_no;
+	}
+
+	console.log("request.session.LAST_COMMENT_G_NO : " + request.session.LAST_COMMENT_G_NO);
+	if(group_no == undefined){
+		console.log("create comment error");
+		jsonPacket.command = "ERROR";
+		response.end(JSON.stringify(jsonPacket));
+		return;
+	}
+
+	var values = [ 
+		[p_content_idx, 
+		p_comment_idx, 
+		user_id, 
+		comment, 
+		depth, 
+		datetime, 
+		group_no, 
+		group_ord] 
+	];
+
+	sqlConnection.query(sqlQuary, [values], (err, result) => {
+		createCommentAction(err, result);
+	});
+}
+
+function createCommentAction(err, result){
+	if(err) {
+		console.log("create error");
+		jsonPacket.command = "ERROR";
+		response.end(JSON.stringify(jsonPacket));
+		return;
+	}
+	if(result.affectedRows){
+		console.log("insert success");
+		jsonPacket.command = "SUCCESSFUL";
+		response.end(JSON.stringify(jsonPacket));		
+	}
+}
+	
+
+/*
 function createComment(callback){
 	var sqlQuary = 'insert into comments' + 
 	'(p_content_idx, p_comment_idx, user_id, comment, depth, datetime, group_no, group_ord) ' + 
@@ -112,6 +177,7 @@ function createCommentAction(err, result, callback){
 		response.end(JSON.stringify(jsonPacket));		
 	}
 }
+*/
 
 function updateCommentsOrder(callback){
 	var group_no = 3;
@@ -138,7 +204,7 @@ function updateCommentsOrderAction(err, result, callback){
 }
 
 function selectComment(){
-	var sqlQuary = "select * from comments where p_content_idx = " + request.body.content_idx + " order by group_no, group_ord";
+	var sqlQuary = "select * from comments where p_content_idx = " + request.body.content_idx + " order by group_no, datetime";
 	
 	sqlConnection.query(sqlQuary, (err, rows) => {
 		selectCommentAction(err, rows);
@@ -153,7 +219,15 @@ function selectCommentAction(err, rows){
 		return;
 	}
 	if(rows){
-		response.end(makeCommentsHtml(rows));
+		if(rows.length == 0){
+			request.session.LAST_COMMENT_G_NO = 0;
+		}
+		else{
+			var lastGroupNo = rows[rows.length-1].group_no;
+			request.session.LAST_COMMENT_G_NO = lastGroupNo;			
+		}
+		response.end(JSON.stringify(rows));
+		//response.end(makeCommentsHtml(rows));
 	}
 }
 
