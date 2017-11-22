@@ -121,9 +121,14 @@ function showContentPopup(result){
 	sendAjax('post', '/mapAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
 		var rows = JSON.parse(result);
-		var html = popup.getContent();
-		popup.setContent(html + makeCommentsHtml(rows));
 	
+		var comments = makeComments(rows);		
+		var commentsHtml = makeCommentsHtml(comments);
+
+		document.getElementById('popup_comment_div').innerHTML = commentsHtml;
+
+		addCommentsComment(comments);
+
 		if (uid == author) {
 			document.getElementById("edit_button").type = 'button';
 			document.getElementById("delete_button").type = 'button';
@@ -131,39 +136,79 @@ function showContentPopup(result){
 	});
 }
 
-function makeCommentsHtml(rows){
+function addCommentsComment(comments){
+	for(var i = 0; i < Object.keys(comments).length; i++){
+		var row = comments[i].row;
+		var depth = row.depth;
+
+		if(depth == 1){
+			var comments_group = document.getElementById('comments_group' + comments[i].row.group_no);
+			comments_group.innerHTML += comments[i].html;
+		}
+	}
+}
+
+function makeComments(rows){
 	if(rows.length == 0){
 		return "";
 	}
+
+	var comments = {};
+
+	for(var i = 0; i < rows.length; i++){
+		var date = new Date(rows[i].datetime);
+		var updateTime =  date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
+		var html = '';
+
+		html += '<div class="comment" id="' + rows[i].comment_idx + '" ' + 
+				'onclick="onCommentClick(this)">';
+			html += '<input id="group_no" type="hidden" value="' + rows[i].group_no + '"/>';
+			html += '<div class="content">';
+				html += '<label class="author">' + rows[i].user_id + '</label>';
+				html += '<div class="metadata">';
+					html += '<span>' + updateTime + '</span>';
+				html += '</div>'
+				html += '<div class="text">'
+						+ rows[i].comment 
+						+ '</div>'
+				html += '<div class="actions">';
+					html += '<a class="reply">Reply</a>';
+					html += '<a class="reply">Edit</a>';
+					html += '<a class="reply">Delete</a>'; 
+				html += '</div>';
+				html += '<form class ui reply form>';
+					html += '<div class="field">';
+						html += '<textarea id="comments_comment' + rows[i].comment_idx + 
+								'" style="display:none; overflow:auto; width:60%;" maxlength="99"></textarea>' + 
+								'<input type="hidden" id="comments_write_button' + rows[i].comment_idx + '" ' + 
+								'value="Write" style="width : 30%;" onclick="onPopupWriteClick(2, this)" class="ui primary button">' + 
+								'<br>';
+					html += '</div>';
+				html += '</form>';
+			html += '</div>';
+			html += '<div id="comments_group' + rows[i].group_no + '" ' +  'class="comments"></div>'
+		html += '</div>';
+
+		comments[i] = { row : rows[i], html : html };
+	}
+	return comments;
+}
+function makeCommentsHtml(comments){
+	if(comments == ""){
+		return "";
+	}
+
 	var html = '<br>';
 	
-	html += '<div style="padding : 15px; border : 1px solid black; overflow : scroll; height : 150px;">';
-	for(var i = 0; i < rows.length; i++){
-		html += '<div id="' + rows[i].comment_idx + '" ' + 
-				'onclick="onCommentClick(this)">';
-		html += '<input id="group_no" type="hidden" value="' + rows[i].group_no + '"/>';
-		html += '<label>';
+	html += '<div class="ui comments" style="padding : 15px;">';
+	
+	for(var i = 0; i < Object.keys(comments).length; i++){
+		var row = comments[i].row;
+		var depth = row.depth;
 
-		for(var j = 0; j < rows[i].depth; j++){
-			if(j == rows[i].depth-1){
-				html += '└';
-			}
-			html += '&nbsp&nbsp&nbsp';
+		if(depth == 0){
+			html += comments[i].html;
 		}
-		html += rows[i].user_id + ' : ';
-		html += rows[i].comment;
-		html += '</label>';
-		html += '<div style="text-align : right;">';
-		html += rows[i].datetime;
-		html += '</div>';
-		html += '<textarea id="comments_comment' + rows[i].comment_idx + 
-		'" style="display:none; overflow:auto; width:60%; height:20px;" maxlength="99"></textarea>' + 
-		'<input type="hidden" id="comments_write_button' + rows[i].comment_idx + '" ' + 
-		'value="Write" style="width : 30%;" onclick="onPopupWriteClick(2, this)" class="ui primary button">' + 
-		'<br>';
-		html += '</div>';
-
-		//console.log("comment_idx : " + rows[i].comment_idx);
 	}
 	html += '</div>';
 
