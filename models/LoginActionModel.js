@@ -11,7 +11,6 @@ exports.action = function(req, res, sqlConn)
 	var id = request.body.id;
 	var pw = request.body.pw;
 
-
 	if(id == ''){
 		console.log('undefined id');	
 
@@ -26,30 +25,42 @@ exports.action = function(req, res, sqlConn)
 	}
 	else{
 		console.log('/loginAction');			
-		onLogin(id, pw);
+		login(id, pw);
 	}
 }
 
-function onLogin(id, pw){
-	var sqlQuary = 'select * ' + 
-					'from `users` ' + 
-					'where `id` = ? and `pw` = ?';
-
-	sqlConnection.query(sqlQuary, [id, pw], (err, rows) => {
-		loginAction(err, rows, id, pw);
-	});
+function login(id, pw){
+	var columns = [ '*' ];
+	var tableName = 'users';
+	var conditionQuary = 'id = ? and pw = ?';
+	var values = [id, pw]
+	
+	var model = require('../models/MySqlQuaryModel.js');
+	var rows = model.selectQuery(
+		sqlConnection, 
+		columns, 
+		tableName, 
+		conditionQuary, 
+		values,
+		loginAction
+	);
 }
 
-function loginAction(err, rows, id, pw){
+function loginAction(err, rows){
 	if(err) {
+		console.log("loginAction error : " + err);
 		request.session.ERRORMESSAGE = "login error";
 		response.redirect('/errorPage');
 		return;
 	}	
 	if(rows.length){
+		var id = rows[0].id;
+		var pw = rows[0].pw;
 		console.log('id : ' + id + ' pw : ' + pw + ' success');
+
 		var user = {id : id, pw : pw};		
 		request.session.USER = user;
+
 		response.redirect('/mapPage');
 	}
 	else{

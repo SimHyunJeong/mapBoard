@@ -53,6 +53,8 @@ app.engine('html', require('ejs').renderFile);
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json({limit : '10mb'}));
 
+app.use(express.static('views'));
+
 // --- session 설정
 app.use(session({
 	secret: '@#@$q1w2e3r4#@$#$',
@@ -71,6 +73,6 @@ var router = require('./Index')(app, mySqlConnection, upload);
 
 // --- 서버 실행
 app.listen(serverPort, function(){
-	console.log('Server running at http://' + hostName+':'+ serverPort);	
+	console.log('Server running at http://' + hostName +':'+ serverPort);	
 });
 

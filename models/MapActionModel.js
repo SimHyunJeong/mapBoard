@@ -4,16 +4,7 @@ var sqlConnection;
 var request;
 var response;
 
-var jsonPacket = {
-	command : "",
-	content_idx : 0,
-	user_id : "",
-	title : "",
-	content : "",
-	lat : 0,
-	lng : 0,
-	datetime : ""
-};
+var responsePacket;
 
 exports.action = function(req, res, sqlConn)
 {
@@ -25,83 +16,66 @@ exports.action = function(req, res, sqlConn)
 
 	if(request.body.command != undefined) {
 		switch(request.body.command){
-			case "SELECT" : {
+			case "LOAD_CONTENTS" : {
+				loadContents();	
+				break;			
+			}
+			case "SELECT_CONTENT" : {
 				selectContent();				
 				break;
 			}
-			case "INSERT" : {
+			case "INSERT_CONTENT" : {
 				createContent();
 				break;
 			}
-			case "DELETE" : {
-				deleteContent(request.body.content_idx);
+			case "DELETE_CONTENT" : {
+				deleteContent();
 				break;
 			}
-			case "UPDATE" : {
+			case "UPDATE_CONTENT" : {
 				updateContent();
 				break;
 			}
-			case "COMMENT" : {
-				/*
-				async.waterfall( 
-					[ 
-						function(callback){ 
-							updateCommentsOrder(callback);							
-						}, 
-						function(isSuccess, callback){ 
-							if(isSuccess){ 
-								createComment(callback); 
-							} 
-						}, 
-						function(err){ 
-							if(err) console.log(err); 
-						} 
-					] 
-				); 
-				*/
+			case "SELECT_COMMENT" : {
 				selectComment();
 				break;
 			}
-			case "CREATE_COMMENT" : {
+			case "INSERT_COMMENT" : {
 				createComment();
 				break;
 			}
 		}
 	}
-	else{
-		loadContents();
-	}
 }
 
 function createComment(){
-	var sqlQuary = 'insert into comments' + 
-	'(p_content_idx, p_comment_idx, user_id, comment, depth, datetime, group_no, group_ord) ' + 
-	'values ?';
-
 	var p_content_idx = request.body.p_content_idx;
 	var p_comment_idx = request.body.p_comment_idx;
 	var user_id = request.body.user_id;
 	var comment = request.body.comment;
 	var depth = request.body.depth;
 	var datetime = new Date();
-	var group_no = request.session.LAST_COMMENT_G_NO + 1;
+	var group_no = request.body.group_no;
 	var group_ord = 0;
-
-	console.log("group_no : " + request.body.group_no);
-	console.log("depth : " + request.body.depth);
 	
-	if(request.body.group_no != null){
-		group_no = request.body.group_no;
+	if(request.body.group_no == ''){
+		group_no = request.session.LAST_COMMENT_G_NO + 1;		
+	}
+	if(request.body.p_comment_idx == ''){
+		p_comment_idx = null;
 	}
 
-	console.log("request.session.LAST_COMMENT_G_NO : " + request.session.LAST_COMMENT_G_NO);
-	if(group_no == undefined){
-		console.log("create comment error");
-		jsonPacket.command = "ERROR";
-		response.end(JSON.stringify(jsonPacket));
-		return;
-	}
-
+	var tableName = 'comments';
+	var columns = [ 
+		'p_content_idx', 
+		'p_comment_idx', 
+		'user_id', 
+		'comment', 
+		'depth', 
+		'datetime', 
+		'group_no', 
+		'group_ord' 
+	];
 	var values = [ 
 		[p_content_idx, 
 		p_comment_idx, 
@@ -113,116 +87,62 @@ function createComment(){
 		group_ord] 
 	];
 
-	sqlConnection.query(sqlQuary, [values], (err, result) => {
-		createCommentAction(err, result);
-	});
+	var model = require('../models/MySqlQuaryModel.js');
+	model.insertQuery(
+		sqlConnection, 
+		tableName, 
+		columns, 
+		values, 
+		createCommentAction
+	);
 }
 
 function createCommentAction(err, result){
 	if(err) {
-		console.log("create error");
-		jsonPacket.command = "ERROR";
-		response.end(JSON.stringify(jsonPacket));
+		console.log("createCommentAction error : " + err);
+		responsePacket = {command : "ERROR"};
+		response.end(JSON.stringify(responsePacket));
 		return;
 	}
 	if(result.affectedRows){
-		console.log("insert success");
-		jsonPacket.command = "SUCCESSFUL";
-		response.end(JSON.stringify(jsonPacket));		
-	}
-}
-	
-
-/*
-function createComment(callback){
-	var sqlQuary = 'insert into comments' + 
-	'(p_content_idx, p_comment_idx, user_id, comment, depth, datetime, group_no, group_ord) ' + 
-	'values ?';
-
-	var p_content_idx = 177;
-	var p_comment_idx = 10;
-	var user_id = "test";
-	var comment = "t_comment 3-1";
-	var depth = 1;
-	var datetime = null;
-	var group_no = 3;
-	var group_ord = 0 + 1;
-
-	var values = [ 
-		[p_content_idx, 
-		p_comment_idx, 
-		user_id, 
-		comment, 
-		depth, 
-		datetime, 
-		group_no, 
-		group_ord] 
-	];
-
-	sqlConnection.query(sqlQuary, [values], (err, result) => {
-		createCommentAction(err, result, callback);
-	});
-}
-
-function createCommentAction(err, result, callback){
-	if(err) {
-		console.log("create error");
-		jsonPacket.command = "ERROR";
-		response.end(JSON.stringify(jsonPacket));
-		return;
-	}
-	if(result.affectedRows){
-		console.log("insert success");
-		jsonPacket.command = "SUCCESSFUL";
-		response.end(JSON.stringify(jsonPacket));		
-	}
-}
-*/
-
-function updateCommentsOrder(callback){
-	var group_no = 3;
-	var group_ord = 0;
-
-	var sqlQuary = 'update comments set group_ord=group_ord+1 where group_no = ' + group_no + ' and group_ord > ' + group_ord;
-
-	sqlConnection.query(sqlQuary, (err, result) => {
-		updateCommentsOrderAction(err, result, callback);
-	});
-}
-
-function updateCommentsOrderAction(err, result, callback){
-	if(err) {
-		console.log("update comments error");
-		jsonPacket.command = "ERROR";
-		response.end(JSON.stringify(jsonPacket));
-		return;
-	}
-	if(result.affectedRows){
-		console.log("update comments success");
-		callback(null, true);
+		console.log("createCommentAction success");
+		responsePacket = {command : "SUCCESSFUL"};
+		response.end(JSON.stringify(responsePacket));		
 	}
 }
 
 function selectComment(){
-	var sqlQuary = "select * from comments where p_content_idx = " + request.body.content_idx + " order by group_no, datetime";
+	var columns = [ '*' ];
+	var tableName = 'comments';
+	var conditionQuary = 'p_content_idx = ? ';
+	conditionQuary += 'order by group_no, datetime';
+	var values = [ request.body.content_idx ]
 	
-	sqlConnection.query(sqlQuary, (err, rows) => {
-		selectCommentAction(err, rows);
-	});
+	var model = require('../models/MySqlQuaryModel.js');
+	model.selectQuery(
+		sqlConnection, 
+		columns, 
+		tableName, 
+		conditionQuary, 
+		values,
+		selectCommentAction
+	);
 }
 
 function selectCommentAction(err, rows){
 	if(err) {
-		console.log("select comments error");
-		jsonPacket.command = "ERROR";
-		response.end(JSON.stringify(jsonPacket));
+		console.log("selectCommentAction error : " + err);
+		responsePacket = {command : "ERROR"};
+		response.end(JSON.stringify(responsePacket));
 		return;
 	}
 	if(rows){
 		if(rows.length == 0){
+			console.log("createCommentAction success, comments zero");			
 			request.session.LAST_COMMENT_G_NO = 0;
 		}
 		else{
+			console.log("createCommentAction success");
 			var lastGroupNo = rows[rows.length-1].group_no;
 			request.session.LAST_COMMENT_G_NO = lastGroupNo;			
 		}
@@ -230,68 +150,83 @@ function selectCommentAction(err, rows){
 	}
 }
 
-
 function loadContents() {
-	var sqlQuary = "select lat, lng from contents ";
+	var columns = [ 'content_idx', 'lat', 'lng' ];
+	var tableName = 'contents';
+	var conditions = null;
+	var values = []
 	
-	sqlConnection.query(sqlQuary, (err, rows) => {
-		loadContentsAction(err, rows);
-	});
+	var model = require('../models/MySqlQuaryModel.js');
+	model.selectQuery(
+		sqlConnection, 
+		columns, 
+		tableName, 
+		conditions, 
+		values,
+		loadContentsAction
+	);
 }
 
 function loadContentsAction(err, rows){
 	if(err) {
+		console.log('loadContentAction error : ' + err);
 		request.session.ERRORMESSAGE = "load contents error";
 		response.redirect('/errorPage');
 		return;
 	}
-	/*
-	for(var i = 0; i < rows.length; i++){
-		console.log("");
-		console.log("idx : " + rows[i].content_idx);
-		console.log("id : " + rows[i].user_id);
-		console.log("title : " + rows[i].title);
-		console.log("content : " + rows[i].content);
-		console.log("lat : " + rows[i].lat);
-		console.log("lng : " + rows[i].lng);
-		console.log("datetime : " + rows[i].datetime);
-	}*/
-
-	request.session.CONTENTS = rows;
-	response.redirect('/mapPage');	
+	if(rows){
+		console.log("loadContentsAction success");
+		responsePacket = {
+			command : "SUCCESSFUL",
+			rows : rows
+		};
+		response.end(JSON.stringify(responsePacket));
+	}
 }
 
 function selectContent() {
-	var sqlQuary = "select * " +
-		"from contents " + 
-		"where lat=" + request.body.lat + 
-		"and lng=" + request.body.lng;
+	var columns = [ '*' ];
+	var tableName = 'contents';
+	var conditionQuary = 'content_idx = ?';
+	var values = [ request.body.content_idx ]
 	
-	sqlConnection.query(sqlQuary, (err, rows) => {
-		selectContentAction(err, rows);
-	});
+	var model = require('../models/MySqlQuaryModel.js');
+	model.selectQuery(
+		sqlConnection, 
+		columns, 
+		tableName, 
+		conditionQuary, 
+		values,
+		selectContentAction
+	);
 }
 
 
 function selectContentAction(err, rows){
 	if(err) {
-		console.log("select error");
-		jsonPacket.command = "ERROR";
-		response.end(JSON.stringify(jsonPacket));
+		console.log("selectContentAction error : " + err);
+		responsePacket = {command : "ERROR"};
+		response.end(JSON.stringify(responsePacket));
 		return;
 	}
 	if(rows){
-		console.log("select success");
-		//jsonPacket.command = "SUCCESSFUL";
-		//response.end(JSON.stringify(jsonPacket));
+		console.log("selectContentAction success");
 		response.render('ContentPopups/ShowContentPopup.ejs', {
 			row : rows[0]
-		});	}
+		});	
+	}
 }
 
 function createContent() {
-	var sqlQuary = "insert into contents(user_id, title, content, lat, lng, datetime) values ?";
-
+	var tableName = 'contents';
+	var columns = [
+		'user_id', 
+		'title', 
+		'content', 
+		'lat', 
+		'lng', 
+		'datetime' 
+	];
 	var values = [ 
 		[request.body.user_id, 
 		request.body.title, 
@@ -301,76 +236,100 @@ function createContent() {
 		new Date()] 
 	];
 
-	sqlConnection.query(sqlQuary, [values], (err, result) => {
-		createContentAction(err, result);
-	});
+	var model = require('../models/MySqlQuaryModel.js');
+	model.insertQuery(
+		sqlConnection, 
+		tableName, 
+		columns, 
+		values, 
+		createContentAction
+	);
 }
 
 function createContentAction(err, result){
 	if(err) {
-		console.log("create error");
-		jsonPacket.command = "ERROR";
-		response.end(JSON.stringify(jsonPacket));
+		console.log("createContentAction error : " + err);
+		responsePacket = {command : "ERROR"};
+		response.end(JSON.stringify(responsePacket));
 		return;
 	}
 	if(result.affectedRows){
-		console.log("insert success");
-		jsonPacket.command = "SUCCESSFUL";
-		jsonPacket.content_idx = result.insertId;
-		response.end(JSON.stringify(jsonPacket));		
+		console.log("createContentAction success");
+		responsePacket = {
+			command : "SUCCESSFUL",
+			content_idx : result.insertId
+		};
+		response.end(JSON.stringify(responsePacket));		
 	}
 }
 
-function deleteContent(idx) {
-	var sqlQuary = "delete from contents where content_idx=" + '\'' + idx + '\'' + ";";
+function deleteContent() {
+	var tableName = 'contents';
+	var conditionQuary = 'content_idx = ?';
+	var values =  [ request.body.content_idx ];
 	
-	sqlConnection.query(sqlQuary, (err, result) => {
-		deleteContentAction(err, result);
-	});
+	var model = require('../models/MySqlQuaryModel.js');
+	model.deleteQuery(
+		sqlConnection, 
+		tableName, 
+		conditionQuary,
+		values,
+		deleteContentAction
+	);
 }
 
 function deleteContentAction(err, result){
 	if(err) {
-		console.log("delete error");
-		jsonPacket.command = "ERROR";
-		response.end(JSON.stringify(jsonPacket));
+		console.log("deleteContentAction error : " + err);
+		responsePacket = {command : "ERROR"};
+		response.end(JSON.stringify(responsePacket));
 		return;
 	}
 	if(result.affectedRows){
-		console.log("delete success");
-		jsonPacket.command = "SUCCESSFUL";
-		response.end(JSON.stringify(jsonPacket));	
+		console.log("deleteContentAction success");
+		responsePacket = {command : "SUCCESSFUL"};
+		response.end(JSON.stringify(responsePacket));	
 	}
 }
 
 function updateContent() {
-	var sqlQuary = "update contents " +
-		"set title = ?, content = ?, datetime = ? " + 
-		"where content_idx = ?";
-	
-	console.log(request.body.content_idx);
-
 	var title = request.body.title; 
 	var content = request.body.content;
 	var datetime = new Date();
 	var content_idx = request.body.content_idx; 
+	
+	var tableName = 'contents';
+	var columns = [ 'title', 'content', 'datetime' ]
+	var conditions = [ 'content_idx' ];
+	var values = [
+		title,
+		content,
+		datetime,
+		content_idx
+	]
 
-	sqlConnection.query(sqlQuary, [title, content, datetime, content_idx], (err, rows) => {
-		updateContentAction(err, rows);
-	});
+	var model = require('../models/MySqlQuaryModel.js');
+	model.updateQuery(
+		sqlConnection, 
+		tableName, 
+		columns,
+		conditions,
+		values,
+		updateContentAction
+	);
 }
 
 function updateContentAction(err, rows) {
 	if(err) {
-		console.log("update error");
-		jsonPacket.command = "ERROR";
-		response.end(JSON.stringify(jsonPacket));
+		console.log("updateContentAction error : " + err);
+		responsePacket = {command : "ERROR"};
+		response.end(JSON.stringify(responsePacket));
 		return;
 	}
 	if(rows){
-		console.log("update success");
-		jsonPacket.command = "SUCCESSFUL";
-		response.end(JSON.stringify(jsonPacket));		
+		console.log("updateContentAction success");
+		responsePacket = {command : "SUCCESSFUL"};
+		response.end(JSON.stringify(responsePacket));		
 	}
 }
 	

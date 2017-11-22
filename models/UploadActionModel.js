@@ -8,22 +8,30 @@ exports.action = function(req, res, sqlConn)
 	request = req;
 	response = res;
 
-	console.log('/upload');		
-	
+	console.log('/upload');	
+
+	if(request.file == undefined){
+		return;
+	}
 	insertFile();
 }
 
 function insertFile() {
-	var sqlQuary = "insert into files(p_content_idx, file_name) values ?";
-
+	var tableName = 'files';
+	var columns = [ 'p_content_idx', 'file_name' ];
 	var values = [ 
 		[request.body.p_content_idx, 
 		request.file.filename] 
 	];
 
-	sqlConnection.query(sqlQuary, [values], (err, result) => {
-		insertFileAction(err, result);
-	});
+	var model = require('../models/MySqlQuaryModel.js');
+	model.insertQuery(
+		sqlConnection, 
+		tableName, 
+		columns, 
+		values, 
+		insertFileAction
+	);
 }
 
 function insertFileAction(err, result){
