@@ -27,15 +27,15 @@ exports.action = function(req, res, sqlConn)
 function loadImages(id, pw){
 	var columns = [ '*' ];
 	var tableName = 'files';
-	var conditionQuary = 'p_content_idx = ?';
+	var conditionQuery = 'p_content_idx = ?';
 	var values = [request.body.p_content_idx];
 	
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	var rows = model.selectQuery(
 		sqlConnection, 
 		columns, 
 		tableName, 
-		conditionQuary, 
+		conditionQuery, 
 		values,
 		loadImagesAction
 	);
@@ -69,7 +69,7 @@ function insertFiles() {
 		values.push([request.body.p_content_idx, files[i].filename]);
 	}
 
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.insertQuery(
 		sqlConnection, 
 		tableName, 

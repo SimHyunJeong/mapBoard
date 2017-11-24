@@ -56,15 +56,15 @@ exports.action = function(req, res, sqlConn)
 function checkUserExist(id, pw, callback){
 	var columns = '*';
 	var tableName = 'users';
-	var conditionQuary = 'id = ?';
+	var conditionQuery = 'id = ?';
 	var values = [id]
 	
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.selectQuery(
 		sqlConnection, 
 		columns, 
 		tableName, 
-		conditionQuary, 
+		conditionQuery, 
 		values,
 		userCheckAction, 
 		callback
@@ -95,7 +95,7 @@ function signUp(id, pw, callback){
 	var columns = ['id', 'pw'];
 	var values = [ [id, pw] ];
 
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.insertQuery(
 		sqlConnection, 
 		tableName, 

@@ -32,15 +32,15 @@ exports.action = function(req, res, sqlConn)
 function login(id, pw){
 	var columns = [ '*' ];
 	var tableName = 'users';
-	var conditionQuary = 'id = ? and pw = ?';
+	var conditionQuery = 'id = ? and pw = ?';
 	var values = [id, pw];
 	
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	var rows = model.selectQuery(
 		sqlConnection, 
 		columns, 
 		tableName, 
-		conditionQuary, 
+		conditionQuery, 
 		values,
 		loginAction
 	);

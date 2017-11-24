@@ -53,7 +53,7 @@ app.engine('html', require('ejs').renderFile);
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json({limit : '10mb'}));
 
-app.use(express.static('views'));
+app.use(express.static('public'));
 
 // --- session 설정
 app.use(session({

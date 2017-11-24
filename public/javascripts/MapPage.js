@@ -98,7 +98,7 @@ function onMarkerClick(e){
 	jsonPacket = {
 		command : "SELECT_CONTENT",
 		content_idx : e.target.title
-	}
+	};
 	popup.setLatLng(e.target._latlng);
 
 	sendAjax('post', '/mapAction', jsonPacket, 'application/x-www-form-urlencoded', showContentPopup);
@@ -116,10 +116,15 @@ function showContentPopup(result){
 	sendAjax('post', '/loadImages', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(data){
 		var rows = JSON.parse(data);
+		var div = document.getElementById("popup_image");
 		for(var i = 0; i < rows.length; i++){
-			var div = document.getElementById("popup_image");
 			var url = '/showImage' + '?file_name=' + rows[i].file_name;
 			div.innerHTML += '<img style="width : 100%;" src="' + url + '"/>';	
+		}
+		for(var i = 0; i < rows.length; i++){
+			var url = '/downloadImage' + '?file_name=' + rows[i].file_name;
+			div.innerHTML += '<a href="' + url + '">' + rows[i].file_name + '</a>';
+			div.innerHTML += '<br>';
 		}
 	});
 	
@@ -190,7 +195,9 @@ function makeComments(rows){
 				if(rows[i].depth == 0){
 					html += '<a class="reply" name="' + rows[i].comment_idx + '" onclick="onReplyClick(this)">Reply</a>';
 				}
+				if(rows[i].user_id == document.getElementById('userId').innerHTML){
 					html += '<a class="reply" onclick="onCommentDeleteClick(this)">Delete</a>'; 
+				}
 				html += '</div>';
 				html += '<form class ui reply form>';
 					html += '<div class="field">';
@@ -209,6 +216,7 @@ function makeComments(rows){
 	}
 	return comments;
 }
+
 function makeCommentsHtml(comments){
 	if(comments == ""){
 		return "";
@@ -232,11 +240,24 @@ function makeCommentsHtml(comments){
 }
 
 function onPopupSaveClick() { 
+	var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/;
+	var title = document.getElementById('title').value;
+	var content = document.getElementById('content').value;
+	
+	if(title == ""){
+		alert("title is empty");
+		return;
+	}
+	else if(regExp.test(title) || regExp.test(content)){
+		alert("can't use special character");
+		return;
+	}
+
 	jsonPacket = {
 		command : "INSERT_CONTENT",
 		user_id : document.getElementById("userId").innerHTML,
-		title : document.getElementById('title').value,
-		content : document.getElementById('content').value,
+		title : title,
+		content : content,
 		lat : popup.getLatLng().lat,
 		lng : popup.getLatLng().lng
 	};
@@ -276,7 +297,7 @@ function onPopupDeleteClick() {
 	jsonPacket = {
 		command : "DELETE_CONTENT",
 		content_idx : document.getElementById("popup_idx").innerHTML		
-	}
+	};
 
 	sendAjax('post', '/mapAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
@@ -299,7 +320,7 @@ function onPopupUpdateClick(){
 		title : document.getElementById('popup_edit_title').value,
 		content : document.getElementById('popup_edit_content').value,
 		content_idx : document.getElementById("popup_edit_idx").innerHTML	
-	}
+	};
 
 	sendAjax('post', '/mapAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){

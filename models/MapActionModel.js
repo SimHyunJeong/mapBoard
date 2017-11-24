@@ -54,14 +54,14 @@ exports.action = function(req, res, sqlConn)
 
 function deleteComment() {
 	var tableName = 'comments';
-	var conditionQuary = 'comment_idx = ?';
+	var conditionQuery = 'comment_idx = ?';
 	var values =  [ request.body.comment_idx ];
 	
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.deleteQuery(
 		sqlConnection, 
 		tableName, 
-		conditionQuary,
+		conditionQuery,
 		values,
 		deleteCommentAction
 	);
@@ -82,14 +82,14 @@ function deleteCommentAction(err, result){
 
 function deleteChildComment() {
 	var tableName = 'comments';
-	var conditionQuary = 'p_comment_idx = ?';
+	var conditionQuery = 'p_comment_idx = ?';
 	var values =  [ request.body.comment_idx ];
 	
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.deleteQuery(
 		sqlConnection, 
 		tableName, 
-		conditionQuary,
+		conditionQuery,
 		values,
 		deleteChildCommentAction
 	);
@@ -148,7 +148,7 @@ function createComment(){
 		group_ord] 
 	];
 
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.insertQuery(
 		sqlConnection, 
 		tableName, 
@@ -175,16 +175,16 @@ function createCommentAction(err, result){
 function selectComment(){
 	var columns = [ '*' ];
 	var tableName = 'comments';
-	var conditionQuary = 'p_content_idx = ? ';
-	conditionQuary += 'order by group_no, datetime';
+	var conditionQuery = 'p_content_idx = ? ';
+	conditionQuery += 'order by group_no, datetime';
 	var values = [ request.body.content_idx ]
 	
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.selectQuery(
 		sqlConnection, 
 		columns, 
 		tableName, 
-		conditionQuary, 
+		conditionQuery, 
 		values,
 		selectCommentAction
 	);
@@ -217,7 +217,7 @@ function loadContents() {
 	var conditions = null;
 	var values = []
 	
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.selectQuery(
 		sqlConnection, 
 		columns, 
@@ -248,15 +248,15 @@ function loadContentsAction(err, rows){
 function selectContent() {
 	var columns = [ '*' ];
 	var tableName = 'contents';
-	var conditionQuary = 'content_idx = ?';
+	var conditionQuery = 'content_idx = ?';
 	var values = [ request.body.content_idx ]
 	
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.selectQuery(
 		sqlConnection, 
 		columns, 
 		tableName, 
-		conditionQuary, 
+		conditionQuery, 
 		values,
 		selectContentAction
 	);
@@ -297,7 +297,7 @@ function createContent() {
 		new Date()] 
 	];
 
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.insertQuery(
 		sqlConnection, 
 		tableName, 
@@ -326,14 +326,14 @@ function createContentAction(err, result){
 
 function deleteContent() {
 	var tableName = 'contents';
-	var conditionQuary = 'content_idx = ?';
+	var conditionQuery = 'content_idx = ?';
 	var values =  [ request.body.content_idx ];
 	
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.deleteQuery(
 		sqlConnection, 
 		tableName, 
-		conditionQuary,
+		conditionQuery,
 		values,
 		deleteContentAction
 	);
@@ -369,7 +369,7 @@ function updateContent() {
 		content_idx
 	]
 
-	var model = require('../models/MySqlQuaryModel.js');
+	var model = require('../models/MySqlQueryModel.js');
 	model.updateQuery(
 		sqlConnection, 
 		tableName, 
