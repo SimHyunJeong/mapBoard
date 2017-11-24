@@ -8,7 +8,7 @@
         <TITLE>CreateContentPopup</TITLE>
     </HEAD>
     <BODY>
-        <div style='width : 100%; height : 300px; overflow-y : scroll;'>
+        <div style='width : 600px; height : 600px; overflow-y : scroll;'>
 
         <strong>Idx : </strong>
         <label id="popup_idx"><%= row.content_idx %></label>
@@ -40,7 +40,7 @@
         <strong>Comments</strong>
         <br>
         <textarea id="popup_comment" style="overflow:auto; width:60%; height:20px;" maxlength="99"></textarea>
-        <input type="button" id="write_button" value="Write" style="width : 30%;" onclick="onPopupWriteClick(1, this)" class="ui primary button">
+        <input type="button" id="write_button" value="Write" style="width : 30%;" onclick="onPopupWriteClick(this)" class="ui primary button">
         <br>
 
         <div id='popup_comment_div' style='width : 100%;'></div>

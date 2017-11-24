@@ -33,7 +33,7 @@ function login(id, pw){
 	var columns = [ '*' ];
 	var tableName = 'users';
 	var conditionQuary = 'id = ? and pw = ?';
-	var values = [id, pw]
+	var values = [id, pw];
 	
 	var model = require('../models/MySqlQuaryModel.js');
 	var rows = model.selectQuery(

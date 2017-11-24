@@ -44,7 +44,68 @@ exports.action = function(req, res, sqlConn)
 				createComment();
 				break;
 			}
+			case "DELETE_COMMENT" : {
+				deleteComment();
+				break;
+			}
 		}
+	}
+}
+
+function deleteComment() {
+	var tableName = 'comments';
+	var conditionQuary = 'comment_idx = ?';
+	var values =  [ request.body.comment_idx ];
+	
+	var model = require('../models/MySqlQuaryModel.js');
+	model.deleteQuery(
+		sqlConnection, 
+		tableName, 
+		conditionQuary,
+		values,
+		deleteCommentAction
+	);
+}
+
+function deleteCommentAction(err, result){
+	if(err) {
+		console.log("deleteCommentAction error : " + err);
+		responsePacket = {command : "ERROR"};
+		response.end(JSON.stringify(responsePacket));
+		return;
+	}
+	if(result.affectedRows){
+		console.log("deleteCommentAction success");
+		deleteChildComment();	
+	}
+}
+
+function deleteChildComment() {
+	var tableName = 'comments';
+	var conditionQuary = 'p_comment_idx = ?';
+	var values =  [ request.body.comment_idx ];
+	
+	var model = require('../models/MySqlQuaryModel.js');
+	model.deleteQuery(
+		sqlConnection, 
+		tableName, 
+		conditionQuary,
+		values,
+		deleteChildCommentAction
+	);
+}
+
+function deleteChildCommentAction(err, result){
+	if(err) {
+		console.log("deleteChildCommentAction error : " + err);
+		responsePacket = {command : "ERROR"};
+		response.end(JSON.stringify(responsePacket));
+		return;
+	}
+	else{
+		console.log("deleteChildCommentAction success");
+		responsePacket = {command : "SUCCESSFUL"};
+		response.end(JSON.stringify(responsePacket));	
 	}
 }
 
@@ -138,11 +199,11 @@ function selectCommentAction(err, rows){
 	}
 	if(rows){
 		if(rows.length == 0){
-			console.log("createCommentAction success, comments zero");			
+			console.log("selectCommentAction success, comments zero");			
 			request.session.LAST_COMMENT_G_NO = 0;
 		}
 		else{
-			console.log("createCommentAction success");
+			console.log("selectCommentAction success");
 			var lastGroupNo = rows[rows.length-1].group_no;
 			request.session.LAST_COMMENT_G_NO = lastGroupNo;			
 		}

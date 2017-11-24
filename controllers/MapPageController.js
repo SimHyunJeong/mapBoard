@@ -27,11 +27,23 @@ module.exports = function(app, sqlConnection, upload)
 		console.log("/editContentPopup");
 	});
 
-	app.post('/upload', upload.single('filename'), function(request, response){
-		var model = require('../models/UploadActionModel.js');	
+	app.post('/uploadImages', upload.single('filename'), function(request, response){
+		if(request.file == undefined){
+			return;
+		}
+		var model = require('../models/ImgActionModel.js');	
 		model.action(request, response, sqlConnection);
 		//res.download('uploads/' + req.file.filename);
 	});
 
+	app.post('/loadImages', function(request, response){
+		var model = require('../models/ImgActionModel.js');	
+		model.action(request, response, sqlConnection);
+	});
+
+	app.get('/showImage', function(request, response){
+		var model = require('../models/ShowImgActionModel.js');	
+		model.action(request, response, request.query.file_name);
+	});
 }
 

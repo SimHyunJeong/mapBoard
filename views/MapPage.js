@@ -72,14 +72,14 @@ function onMouseMove(e){
 	document.getElementById("lng").value = lng;
 }
 
-var popup = L.popup({ closeButton: false });
+var popup = L.popup({ closeButton : false, maxWidth : 'auto' });
 
 function onMapClick(e) {
 	var lat = e.latlng.lat;
 	var lng = e.latlng.lng;
 	
 	if( lat > 85 || lat < -85 || lng > 180 || lng < -180 ){
-		alert("out of map");
+		//alert("out of map");
 		return;
 	}
 
@@ -106,6 +106,27 @@ function onMarkerClick(e){
 function showContentPopup(result){
 	popup.setContent(result);
 	popup.openOn(map);
+	
+	/*
+	var div = document.getElementById("popup_content");
+	var url = '/showImg';
+	div.innerHTML += '<img style="width : 100%;" src="' + url + '"/>';
+	*/
+	
+	jsonPacket = {
+		command : 'LOAD_IMAGES',
+		p_content_idx : document.getElementById('popup_idx').innerHTML
+	}
+	
+	sendAjax('post', '/loadImages', jsonPacket, 'application/x-www-form-urlencoded')
+	.done(function(data){
+		var rows = JSON.parse(data);
+		for(var i = 0; i < rows.length; i++){
+			var div = document.getElementById("popup_content");
+			var url = '/showImage' + '?file_name=' + rows[i].file_name;
+			div.innerHTML += '<img style="width : 100%;" src="' + url + '"/>';	
+		}
+	});
 	
 	var uid = document.getElementById("userId").innerHTML;
 	var author = document.getElementById("popup_id").innerHTML;
@@ -160,8 +181,7 @@ function makeComments(rows){
 		var updateTime =  date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 		var html = '';
 
-		html += '<div class="comment" id="' + rows[i].comment_idx + '" ' + 
-				'onclick="onCommentClick(this)">';
+		html += '<div class="comment" id="' + rows[i].comment_idx + '">';
 			html += '<input id="group_no" type="hidden" value="' + rows[i].group_no + '"/>';
 			html += '<div class="content">';
 				html += '<label class="author">' + rows[i].user_id + '</label>';
@@ -172,16 +192,17 @@ function makeComments(rows){
 						+ rows[i].comment 
 						+ '</div>'
 				html += '<div class="actions">';
-					html += '<a class="reply">Reply</a>';
-					html += '<a class="reply">Edit</a>';
-					html += '<a class="reply">Delete</a>'; 
+				if(rows[i].depth == 0){
+					html += '<a class="reply" name="' + rows[i].comment_idx + '" onclick="onReplyClick(this)">Reply</a>';
+				}
+					html += '<a class="reply" onclick="onCommentDeleteClick(this)">Delete</a>'; 
 				html += '</div>';
 				html += '<form class ui reply form>';
 					html += '<div class="field">';
 						html += '<textarea id="comments_comment' + rows[i].comment_idx + 
 								'" style="display:none; overflow:auto; width:60%;" maxlength="99"></textarea>' + 
 								'<input type="hidden" id="comments_write_button' + rows[i].comment_idx + '" ' + 
-								'value="Write" style="width : 30%;" onclick="onPopupWriteClick(2, this)" class="ui primary button">' + 
+								'value="Write" style="width : 30%;" onclick="onReplyWriteClick(this)" class="ui primary button">' + 
 								'<br>';
 					html += '</div>';
 				html += '</form>';
@@ -242,7 +263,7 @@ function uploadImage(result){
 
 		formData.append('p_content_idx', receive.content_idx);
 
-		sendAjax('post', '/upload', formData, 'multipart/form-data');
+		sendAjax('post', '/uploadImages', formData, 'multipart/form-data');
 
 		alert("Your image has been upload successfully.");
 		location.reload();
@@ -316,31 +337,28 @@ function onPopupEditClick() {
 	popup.openOn(map);
 }
 
-function onPopupWriteClick(check, clickedObj){
-	// 댓글
-	if(check == 1){
-		jsonPacket = {
-			command : 'INSERT_COMMENT',
-			p_content_idx : document.getElementById("popup_idx").innerHTML,
-			p_comment_idx : null,
-			user_id : document.getElementById("userId").innerHTML,
-			comment : document.getElementById('popup_comment').value,
-			depth : 0,
-			group_no : null
-		}
+function onPopupWriteClick(clickedObj){
+	var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/;
+	var comment = document.getElementById('popup_comment').value;
+
+	if(comment == ""){
+		alert("comment is empty");
+		return;
 	}
-	// 대댓글
-	else if(check == 2){
-		jsonPacket = {
-			command : 'INSERT_COMMENT',
-			p_content_idx : document.getElementById("popup_idx").innerHTML,
-			p_comment_idx : null,
-			user_id : document.getElementById("userId").innerHTML,
-			comment : document.getElementById('comments_comment' + clickedObj.parentNode.id).value,
-			depth : 1,
-			group_no : clickedObj.parentNode.firstChild.value
-		}
+	else if(regExp.test(comment)){
+		alert("can't use special character");
+		return;
 	}
+
+	jsonPacket = {
+		command : 'INSERT_COMMENT',
+		p_content_idx : document.getElementById("popup_idx").innerHTML,
+		p_comment_idx : null,
+		user_id : document.getElementById("userId").innerHTML,
+		comment : comment,
+		depth : 0,
+		group_no : null
+	};
 	
 	sendAjax('post', '/mapAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
@@ -357,10 +375,70 @@ function onPopupWriteClick(check, clickedObj){
 	});
 }
 
-function onCommentClick(clickedObj){
-	//alert(clickedObj.id);
-	document.getElementById('comments_comment' + clickedObj.id).style.display = "block";
-	document.getElementById('comments_write_button' + clickedObj.id).type = "button";
+function onReplyWriteClick(clickedObj){
+	var commentNode = clickedObj.parentNode.parentNode.parentNode.parentNode;
+	var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/;
+	var comment = document.getElementById('comments_comment' + commentNode.id).value;
+
+	if(comment == ""){
+		alert("comment is empty");
+		return;
+	}
+	else if(regExp.test(comment)){
+		alert("can't use special character");
+		return;
+	}
+	
+	jsonPacket = {
+		command : 'INSERT_COMMENT',
+		p_content_idx : document.getElementById("popup_idx").innerHTML,
+		p_comment_idx : commentNode.id,
+		user_id : document.getElementById("userId").innerHTML,
+		comment : document.getElementById('comments_comment' + commentNode.id).value,
+		depth : 1,
+		group_no : commentNode.firstChild.value
+	};
+	
+	sendAjax('post', '/mapAction', jsonPacket, 'application/x-www-form-urlencoded')
+	.done(function(result){
+		var receive = JSON.parse(result);
+
+		if (receive.command == "SUCCESSFUL") {
+			alert("Your comment has been created successfully.");
+		}
+		else {
+			alert("Something wrong on your post. Please contact to server manager.");
+		}
+
+		location.reload();				
+	});
+}
+
+function onCommentDeleteClick(clickedObj){
+	var commentNode = clickedObj.parentNode.parentNode.parentNode;
+	jsonPacket = {
+		command : 'DELETE_COMMENT',
+		comment_idx : commentNode.id
+	};
+	
+	sendAjax('post', '/mapAction', jsonPacket, 'application/x-www-form-urlencoded')
+	.done(function(result){
+		var receive = JSON.parse(result);
+
+		if (receive.command == "SUCCESSFUL") {
+			alert("Your comment has been deleted successfully.");
+		}
+		else {
+			alert("Something wrong on your post. Please contact to server manager.");
+		}
+
+		location.reload();				
+	});
+}
+
+function onReplyClick(clickedObj){
+	document.getElementById('comments_comment' + clickedObj.name).style.display = "block";
+	document.getElementById('comments_write_button' + clickedObj.name).type = "button";
 }
 
 function sendAjax(type, url, data, enctype, successFunction, errorFunction){
@@ -396,12 +474,12 @@ function sendAjax(type, url, data, enctype, successFunction, errorFunction){
 			break;
 		}
 	}
+}
 
-	function showObject(obj){
-		var str = '';
-		for(key in obj){
-			str += key + '=' + obj[key] + '\n';
-		}
-		alert(str);
+function showObject(obj){
+	var str = '';
+	for(key in obj){
+		str += key + '=' + obj[key] + '\n';
 	}
+	alert(str);
 }
