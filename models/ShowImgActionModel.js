@@ -8,11 +8,9 @@ exports.action = function(req, res, file_name)
 	request = req;
 	response = res;
 
-	console.log('/showImage');	
+	console.log('/showImage' + '?file_name=' + file_name);	
 
-	fs.readFile('./uploads/' + file_name, function(err, data){
-		//response.writeHead(200, {'Content-Type' : 'text/html'});
-		response.end(data);
-	});
+	var file = fs.readFileSync('./uploads/' + file_name);
+	response.end(file);
 
 }

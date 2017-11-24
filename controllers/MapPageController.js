@@ -27,13 +27,12 @@ module.exports = function(app, sqlConnection, upload)
 		console.log("/editContentPopup");
 	});
 
-	app.post('/uploadImages', upload.single('filename'), function(request, response){
-		if(request.file == undefined){
+	app.post('/uploadImages', upload.array('uploadFiles'), function(request, response){
+		if(request.files == undefined){
 			return;
 		}
 		var model = require('../models/ImgActionModel.js');	
 		model.action(request, response, sqlConnection);
-		//res.download('uploads/' + req.file.filename);
 	});
 
 	app.post('/loadImages', function(request, response){
@@ -44,6 +43,10 @@ module.exports = function(app, sqlConnection, upload)
 	app.get('/showImage', function(request, response){
 		var model = require('../models/ShowImgActionModel.js');	
 		model.action(request, response, request.query.file_name);
+	});
+
+	app.get('/downloadImage', function(request, response){
+		response.download('./uploads/' + request.query.file_name);
 	});
 }
 

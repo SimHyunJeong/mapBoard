@@ -19,7 +19,7 @@ exports.action = function(req, res, sqlConn)
 		}
 	}
 	else{
-		insertFile();
+		insertFiles();
 	}
 }
 
@@ -59,13 +59,15 @@ function loadImagesAction(err, rows){
 	}
 }
 
-function insertFile() {
+function insertFiles() {
+	var files = request.files;
 	var tableName = 'files';
 	var columns = [ 'p_content_idx', 'file_name' ];
-	var values = [ 
-		[request.body.p_content_idx, 
-		request.file.filename] 
-	];
+	var values = [];
+
+	for(var i = 0; i < files.length; i++){
+		values.push([request.body.p_content_idx, files[i].filename]);
+	}
 
 	var model = require('../models/MySqlQuaryModel.js');
 	model.insertQuery(
@@ -73,11 +75,11 @@ function insertFile() {
 		tableName, 
 		columns, 
 		values, 
-		insertFileAction
+		insertFilesAction
 	);
 }
 
-function insertFileAction(err, result){
+function insertFilesAction(err, result){
 	if(err) {
 		console.log("insert file error : " + err);
 		return;

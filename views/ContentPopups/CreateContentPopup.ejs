@@ -18,9 +18,9 @@
         <textarea style="overflow:auto; width:300px; height:75px;" name="textarea" id="content" rows="5" cols="40"></textarea>
         <br><br>
         
-        <form id="fileupload" method="post" action="/upload" enctype="multipart/form-data">
+        <form id="uploadForm" method="post" action="/upload" enctype="multipart/form-data">
             파일 선택 : 
-            <input type="file" id="filename" name="filename">
+            <input type="file" id="uploadFiles" name="uploadFiles" multiple>
         </form>
         <br>
 

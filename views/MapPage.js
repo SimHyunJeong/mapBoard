@@ -21,6 +21,7 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 	bounds : layerBounds
 }).addTo(map);
 
+// 가로는 타일 크기 이상 범위지정이 되는데 세로는 타일의 크기 이상 지정이 안된다
 //var mapBoundStart = L.latLng(-10000, -500);
 //var mapBoundEnd = L.latLng(10000, 500);
 //var mapBounds = L.latLngBounds(mapBoundStart, mapBoundEnd);
@@ -107,12 +108,6 @@ function showContentPopup(result){
 	popup.setContent(result);
 	popup.openOn(map);
 	
-	/*
-	var div = document.getElementById("popup_content");
-	var url = '/showImg';
-	div.innerHTML += '<img style="width : 100%;" src="' + url + '"/>';
-	*/
-	
 	jsonPacket = {
 		command : 'LOAD_IMAGES',
 		p_content_idx : document.getElementById('popup_idx').innerHTML
@@ -122,7 +117,7 @@ function showContentPopup(result){
 	.done(function(data){
 		var rows = JSON.parse(data);
 		for(var i = 0; i < rows.length; i++){
-			var div = document.getElementById("popup_content");
+			var div = document.getElementById("popup_image");
 			var url = '/showImage' + '?file_name=' + rows[i].file_name;
 			div.innerHTML += '<img style="width : 100%;" src="' + url + '"/>';	
 		}
@@ -253,10 +248,10 @@ function uploadImage(result){
 	var receive = JSON.parse(result);
 
 	if (receive.command == "SUCCESSFUL") {	
-		var form = document.getElementById('fileupload');
+		var form = document.getElementById('uploadForm');
 		var formData = new FormData(form);
 		
-		if(form.filename.value == ''){
+		if(form.uploadFiles.value == ''){
 			location.reload();			
 			return;
 		}
@@ -444,7 +439,7 @@ function onReplyClick(clickedObj){
 function sendAjax(type, url, data, enctype, successFunction, errorFunction){
 	if(errorFunction == undefined){
 		errorFunction = function(result) {
-			alert(result.status + " : " + result.description);
+			alert('status : ' + result.status + " : " + result.description);
 		};
 	}
 
