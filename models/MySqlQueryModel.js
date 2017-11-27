@@ -1,6 +1,6 @@
 exports.selectQuery = function(sqlConnection, columns, tableName, conditionQuery, values, action, callback)
 {
-    var columnQuery = makeQuery(columns);
+    var columnQuery = makeColumnQuery(columns);
     var sqlQuery;
 
     if(conditionQuery == null){
@@ -22,7 +22,7 @@ exports.selectQuery = function(sqlConnection, columns, tableName, conditionQuery
 
 exports.insertQuery = function(sqlConnection, tableName, columns, values, action, callback)
 {
-    var columnQuery = '( ' + makeQuery(columns) + ' )';
+    var columnQuery = '( ' + makeColumnQuery(columns) + ' )';
     var sqlQuery = 'insert into ' + tableName + columnQuery +
                 ' values ?';
                     
@@ -47,7 +47,7 @@ exports.deleteQuery = function(sqlConnection, tableName, conditionQuery, values,
 
 exports.updateQuery = function(sqlConnection, tableName, columns, conditionQuery, values, action, callback)
 {
-    var columnQuery = makeQuestionQuery(columns);
+    var columnQuery = makeUpdateColumnQuery(columns);
     var sqlQuery = 'update ' + tableName +
                 ' set ' + columnQuery + 
                 ' where ' + conditionQuery;
@@ -63,7 +63,7 @@ exports.updateQuery = function(sqlConnection, tableName, columns, conditionQuery
 
 
 
-function makeQuestionQuery(arr){
+function makeUpdateColumnQuery(arr){
     var result = '';
     for(var i = 0; i < arr.length; i++){
         if(i == arr.length-1){
@@ -76,7 +76,7 @@ function makeQuestionQuery(arr){
     return result;
 }
 
-function makeQuery(arr){
+function makeColumnQuery(arr){
     var result = '';
     for(var i = 0; i < arr.length; i++){
         if(i == arr.length-1){

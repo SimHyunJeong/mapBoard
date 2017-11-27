@@ -26,6 +26,7 @@
         <br>
         <div id="popup_content" style="width : 100%;"><%= row.content %></div>
         <div id="popup_image" style="width : 100%;"></div> 
+        <div id="popup_download" style="width : 100%;"></div>         
         <br>
         
         <strong>Updated time</strong>
@@ -40,10 +41,10 @@
     
         <strong>Comments</strong>
         <br>
-        <textarea id="popup_comment" style="overflow:auto; width:60%; height:20px;" maxlength="99"></textarea>
+        <textarea id="popup_comment_input" style="overflow:auto; width:60%; height:20px;" maxlength="99"></textarea>
         <input type="button" id="write_button" value="Write" style="width : 30%;" onclick="onPopupWriteClick(this)" class="ui primary button">
         <br>
 
-        <div id='popup_comment_div' style='width : 100%;'></div>
+        <div id='popup_comment' style='width : 100%;'></div>
     </BODY>
 </HTML>

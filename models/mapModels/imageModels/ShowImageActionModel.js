@@ -12,5 +12,4 @@ exports.action = function(req, res, file_name)
 
 	var file = fs.readFileSync('./uploads/' + file_name);
 	response.end(file);
-
 }
