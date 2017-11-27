@@ -105,6 +105,20 @@ function showContentPopup(result){
 	popup.setContent(result);
 	popup.openOn(map);
 	
+	loadImages();
+	
+	var uid = document.getElementById("userId").innerHTML;
+	var author = document.getElementById("popup_id").innerHTML;
+
+	if (uid == author) {
+		document.getElementById("edit_button").type = 'button';
+		document.getElementById("delete_button").type = 'button';
+	}
+
+	loadComments();
+}
+
+function loadImages(){
 	jsonPacket = {
 		p_content_idx : document.getElementById('popup_idx').innerHTML
 	}
@@ -125,19 +139,12 @@ function showContentPopup(result){
 			downloadDiv.innerHTML += '<br>';
 		}
 	});
-	
-	var uid = document.getElementById("userId").innerHTML;
-	var author = document.getElementById("popup_id").innerHTML;
+}
 
-	if (uid == author) {
-		document.getElementById("edit_button").type = 'button';
-		document.getElementById("delete_button").type = 'button';
-	}
-
+function loadComments(){
 	jsonPacket = {
 		content_idx : document.getElementById('popup_idx').innerHTML
 	}
-		
 
 	sendAjax('post', '/loadCommentsAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
@@ -383,7 +390,7 @@ function onPopupWriteClick(clickedObj){
 			alert("Something wrong on your post. Please contact to server manager.");
 		}
 
-		location.reload();				
+		loadComments();		
 	});
 }
 
@@ -421,7 +428,7 @@ function onReplyWriteClick(clickedObj){
 			alert("Something wrong on your post. Please contact to server manager.");
 		}
 
-		location.reload();				
+		loadComments();
 	});
 }
 
@@ -442,7 +449,7 @@ function onCommentDeleteClick(clickedObj){
 			alert("Something wrong on your post. Please contact to server manager.");
 		}
 
-		location.reload();				
+		loadComments();
 	});
 }
 
