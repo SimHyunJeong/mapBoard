@@ -25,6 +25,8 @@ module.exports = function(app, sqlConnection, upload)
 	var commentModelsPath = '../models/mapModels/commentModels';
 	var imageModelsPath = '../models/mapModels/imageModels';
 	
+	// ---------- content ---------------------------------------------------
+
 	app.get('/loadContentsAction', function(request, response){
 		var model = require(contentModelsPath + '/LoadContentsActionModel.js');	
 		model.action(request, response, sqlConnection);
@@ -46,6 +48,7 @@ module.exports = function(app, sqlConnection, upload)
 		model.action(request, response, sqlConnection);
 	});
 
+	// ---------- comment ---------------------------------------------------
 
 	app.post('/loadCommentsAction', function(request, response){
 		var model = require(commentModelsPath + '/LoadCommentsActionModel.js');	
@@ -60,6 +63,7 @@ module.exports = function(app, sqlConnection, upload)
 		model.action(request, response, sqlConnection);
 	});
 
+	// ---------- image ---------------------------------------------------
 
 	app.post('/loadImagesAction', function(request, response){
 		var model = require(imageModelsPath + '/LoadImagesActionModel.js');	
@@ -77,7 +81,7 @@ module.exports = function(app, sqlConnection, upload)
 		model.action(request, response, request.query.file_name);
 	});
 	app.get('/downloadImage', function(request, response){
-		response.download('./uploads/' + request.query.file_name);
+		response.download('./uploads/' + request.query.file_name, request.query.original_name);
 	});
 }
 

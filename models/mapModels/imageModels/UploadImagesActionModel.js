@@ -16,11 +16,16 @@ exports.action = function(req, res, sqlConn)
 function insertImages() {
 	var files = request.files;
 	var tableName = 'files';
-	var columns = [ 'p_content_idx', 'file_name' ];
+	var columns = [ 'p_content_idx', 'file_name', 'original_name' ];
 	var values = [];
 
 	for(var i = 0; i < files.length; i++){
-		values.push([request.body.p_content_idx, files[i].filename]);
+		console.log(files[i]);
+		values.push([
+			request.body.p_content_idx, 
+			files[i].filename, 
+			files[i].originalname
+		]);
 	}
 
 	var model = require('../../MySqlQueryModel.js');

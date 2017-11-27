@@ -120,8 +120,8 @@ function showContentPopup(result){
 			imageDiv.innerHTML += '<img style="width : 100%;" src="' + url + '"/>';	
 		}
 		for(var i = 0; i < rows.length; i++){
-			var url = '/downloadImage' + '?file_name=' + rows[i].file_name;
-			downloadDiv.innerHTML += '<a href="' + url + '">' + rows[i].file_name + '</a>';
+			var url = '/downloadImage' + '?' + 'file_name=' + rows[i].file_name + '&' + 'original_name=' + rows[i].original_name;
+			downloadDiv.innerHTML += '<a href="' + url + '">' + rows[i].original_name + '</a>';
 			downloadDiv.innerHTML += '<br>';
 		}
 	});
