@@ -10,11 +10,19 @@ exports.action = function(req, res, sqlConn)
 	response = res;
 	model = require('../MySqlQueryModel.js');
 
-	console.log('/loadImagesAction');
+	console.log('/imageAction');
 
-	loadImages();	
+	switch(request.body.command){
+        case "LOAD_IMAGES" : {
+            loadImages();	
+            break;			
+		}
+		case "UPLOAD_IMAGES" : {
+			insertImages();
+            break;			
+        }
+    }
 }
-
 
 function loadImages(id, pw){
 	var columns = [ '*' ];
@@ -47,5 +55,40 @@ function loadImagesAction(err, rows){
 			console.log("loadImagesAction success");
 		}
 		response.end(JSON.stringify(rows));
+	}
+}
+
+function insertImages() {
+	var files = request.files;
+	var tableName = 'files';
+	var columns = [ 'p_content_idx', 'file_name', 'original_name' ];
+	var values = [];
+
+	for(var i = 0; i < files.length; i++){
+		console.log(files[i]);
+		values.push([
+			request.body.p_content_idx, 
+			files[i].filename, 
+			files[i].originalname
+		]);
+	}
+
+	model.insertQuery(
+		sqlConnection, 
+		tableName, 
+		columns, 
+		values, 
+		insertImagesAction
+	);
+}
+
+function insertImagesAction(err, result){
+	if(err) {
+		console.log("insert image error : " + err);
+		return;
+	}
+	if(result.affectedRows){
+		console.log("insert image success");
+		return;
 	}
 }

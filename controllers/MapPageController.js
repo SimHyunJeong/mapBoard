@@ -38,7 +38,11 @@ module.exports = function(app, sqlConnection, upload)
 	});
 
 	// ---------- image ---------------------------------------------------
-
+	
+	app.post('/imageAction', function(request, response){
+		var model = require(mapModelsPath + '/ImageActionModel.js');	
+		model.action(request, response, sqlConnection);
+	});
 	app.post('/loadImagesAction', function(request, response){
 		var model = require(mapModelsPath + '/LoadImagesActionModel.js');	
 		model.action(request, response, sqlConnection);
