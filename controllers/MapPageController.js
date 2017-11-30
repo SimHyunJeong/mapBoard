@@ -21,38 +21,37 @@ module.exports = function(app, sqlConnection, upload)
 		console.log("/editContentPopup");
 	});
 
-	var commentModelsPath = '../models/mapModels/commentModels';
-	var imageModelsPath = '../models/mapModels/imageModels';
+	var mapModelsPath = '../models/mapModels';
 	
 	// ---------- content ---------------------------------------------------
 
 	app.post('/contentAction', function(request, response){
-		var model = require('../models/mapModels/ContentActionModel.js');
+		var model = require(mapModelsPath + '/ContentActionModel.js');
 		model.action(request, response, sqlConnection);
 	});
 
 	// ---------- comment ---------------------------------------------------
 
 	app.post('/commentAction', function(request, response){
-		var model = require('../models/mapModels/CommentActionModel.js');
+		var model = require(mapModelsPath + '/CommentActionModel.js');
 		model.action(request, response, sqlConnection);
 	});
 
 	// ---------- image ---------------------------------------------------
 
 	app.post('/loadImagesAction', function(request, response){
-		var model = require(imageModelsPath + '/LoadImagesActionModel.js');	
+		var model = require(mapModelsPath + '/LoadImagesActionModel.js');	
 		model.action(request, response, sqlConnection);
 	});
 	app.post('/uploadImagesAction', upload.array('uploadFiles'), function(request, response){
 		if(request.files == undefined){
 			return;
 		}
-		var model = require(imageModelsPath + '/UploadImagesActionModel.js');	
+		var model = require(mapModelsPath + '/UploadImagesActionModel.js');	
 		model.action(request, response, sqlConnection);
 	});
 	app.get('/showImageAction', function(request, response){
-		var model = require(imageModelsPath + '/ShowImageActionModel.js');	
+		var model = require(mapModelsPath + '/ShowImageActionModel.js');	
 		model.action(request, response, request.query.file_name);
 	});
 	app.get('/downloadImage', function(request, response){

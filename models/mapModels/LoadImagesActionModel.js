@@ -1,12 +1,14 @@
 var sqlConnection;
 var request;
 var response;
+var model;
 
 exports.action = function(req, res, sqlConn)
 {
 	sqlConnection = sqlConn;
 	request = req;
 	response = res;
+	model = require('../MySqlQueryModel.js');
 
 	console.log('/loadImagesAction');
 
@@ -20,7 +22,6 @@ function loadImages(id, pw){
 	var conditionQuery = 'p_content_idx = ?';
 	var values = [request.body.p_content_idx];
 	
-	var model = require('../../MySqlQueryModel.js');
 	var rows = model.selectQuery(
 		sqlConnection, 
 		columns, 

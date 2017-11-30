@@ -1,12 +1,14 @@
 var sqlConnection;
 var request;
 var response;
+var model;
 
 exports.action = function(req, res, sqlConn)
 {
 	sqlConnection = sqlConn;
 	request = req;
 	response = res;
+	model = require('../MySqlQueryModel.js');
 
 	console.log('/uploadImagesAction');
 
@@ -28,7 +30,6 @@ function insertImages() {
 		]);
 	}
 
-	var model = require('../../MySqlQueryModel.js');
 	model.insertQuery(
 		sqlConnection, 
 		tableName, 
