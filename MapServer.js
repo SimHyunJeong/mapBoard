@@ -30,6 +30,7 @@ mySqlConnection.connect(err => {
 
 // --- multer 설정
 /*
+// filename을 원하는 데로 설정
 var storage = multer.diskStorage({
 	destination : 'uploads/',
 	filename : function(req, file, callback){

@@ -1,40 +1,53 @@
+// 화면에 표시될 팝업
+var popup;
 
-// 사이드 메뉴 토글
-$('#show_sidebar').click(function(){
-	$('.ui.sidebar').sidebar('toggle');
-});
+// ajax에 사용할 json데이터
+var jsonPacket;
 
-// 기본 뷰 전세계
-var map = L.map('map').setView([0, 0], 1);
-
-// 마커 클러스터 : 마커 병합해서 숫자로 표시해주는 기능
-var markers = new L.MarkerClusterGroup();
-var markersList = [];
-
-// 범위 지정 -- 안하면 지도가 반복적으로 나오지만 지도마다 좌표가 다르다
-var layerBoundStart = L.latLng(-85, -180);
-var layerBoundEnd = L.latLng(85, 180);
-var layerBounds = L.latLngBounds(layerBoundStart, layerBoundEnd);
-
-L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-	attribution : '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-	bounds : layerBounds
-}).addTo(map);
+// leaflet.js
+var map;
+var tileLayer;
 
 // 가로는 타일 크기 이상 범위지정이 되는데 세로는 타일의 크기 이상 지정이 안된다
 //var mapBoundStart = L.latLng(-10000, -500);
 //var mapBoundEnd = L.latLng(10000, 500);
 //var mapBounds = L.latLngBounds(mapBoundStart, mapBoundEnd);
-
 //map.setMaxBounds(mapBounds);
-map.on('click', onMapClick);
-map.on('mousemove', onMouseMove);
 
-var jsonPacket;
+function init(){
+	// 사이드 메뉴 토글
+	$('#show_sidebar').click(function(){
+		$('.ui.sidebar').sidebar('toggle');
+	});
 
-sendAjax('get', '/loadContentsAction', null, 'application/x-www-form-urlencoded', makeMarkers);
+	map = L.map('map').setView([0, 0], 1);
+
+	// 범위 지정 -- 안하면 지도가 반복적으로 나오지만 지도마다 좌표가 다르다
+	var layerBoundStart = L.latLng(-85, -180);
+	var layerBoundEnd = L.latLng(85, 180);
+	var layerBounds = L.latLngBounds(layerBoundStart, layerBoundEnd);
+
+	tileLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+		attribution : '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+		bounds : layerBounds
+	});
+
+	popup = L.popup({ closeButton : false, maxWidth : 'auto' });
+	
+	tileLayer.addTo(map);
+
+	jsonPacket = { command : 'LOAD_CONTENTS' };
+	sendAjax('post', '/contentAction', jsonPacket, 'application/x-www-form-urlencoded', makeMarkers);	
+
+	map.on('click', onMapClick);
+	map.on('mousemove', onMouseMove);
+}
 
 function makeMarkers(result){
+	// 마커 클러스터 : 마커 병합해서 숫자로 표시해주는 기능
+	var markers = new L.MarkerClusterGroup();
+	var markersList = [];
+
 	var receive = JSON.parse(result);
 	if (receive.command != "SUCCESSFUL") {
 		alert("Something wrong on your post. Please contact to server manager.");
@@ -71,8 +84,6 @@ function onMouseMove(e){
 	document.getElementById("lng").value = lng;
 }
 
-var popup = L.popup({ closeButton : false, maxWidth : 'auto' });
-
 function onMapClick(e) {
 	var lat = e.latlng.lat;
 	var lng = e.latlng.lng;
@@ -94,11 +105,12 @@ function onMapClick(e) {
 
 function onMarkerClick(e){
 	jsonPacket = {
+		command : 'SELECT_CONTENT',
 		content_idx : e.target.title
 	};
 	popup.setLatLng(e.target._latlng);
 
-	sendAjax('post', '/selectContentAction', jsonPacket, 'application/x-www-form-urlencoded', showContentPopup);
+	sendAjax('post', '/contentAction', jsonPacket, 'application/x-www-form-urlencoded', showContentPopup);
 }
 
 function showContentPopup(result){
@@ -143,10 +155,11 @@ function loadImages(){
 
 function loadComments(){
 	jsonPacket = {
+		command : 'LOAD_COMMENTS',
 		content_idx : document.getElementById('popup_idx').innerHTML
 	}
 
-	sendAjax('post', '/loadCommentsAction', jsonPacket, 'application/x-www-form-urlencoded')
+	sendAjax('post', '/commentAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
 		var rows = JSON.parse(result);
 	
@@ -261,6 +274,7 @@ function onPopupSaveClick() {
 	}
 
 	jsonPacket = {
+		command : 'INSERT_CONTENT',		
 		user_id : document.getElementById("userId").innerHTML,
 		title : title,
 		content : content,
@@ -268,7 +282,7 @@ function onPopupSaveClick() {
 		lng : popup.getLatLng().lng
 	};
 	
-	sendAjax('post', '/insertContentAction', jsonPacket, 'application/x-www-form-urlencoded', uploadImage);
+	sendAjax('post', '/contentAction', jsonPacket, 'application/x-www-form-urlencoded', uploadImage);
 }
 
 function uploadImage(result){
@@ -301,10 +315,11 @@ function onPopupCloseClick() {
 
 function onPopupDeleteClick() {
 	jsonPacket = {
+		command : 'DELETE_CONTENT',		
 		content_idx : document.getElementById("popup_idx").innerHTML		
 	};
 
-	sendAjax('post', '/deleteContentAction', jsonPacket, 'application/x-www-form-urlencoded')
+	sendAjax('post', '/contentAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
 		var receive = JSON.parse(result);
 
@@ -321,12 +336,13 @@ function onPopupDeleteClick() {
 
 function onPopupUpdateClick(){
 	jsonPacket = {
+		command : 'DELETE_CONTENT',		
 		title : document.getElementById('popup_edit_title').value,
 		content : document.getElementById('popup_edit_content').value,
 		content_idx : document.getElementById("popup_edit_idx").innerHTML	
 	};
 
-	sendAjax('post', '/updateContentAction', jsonPacket, 'application/x-www-form-urlencoded')
+	sendAjax('post', '/contentAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
 		var receive = JSON.parse(result);
 
@@ -371,6 +387,7 @@ function onPopupWriteClick(clickedObj){
 	}
 
 	jsonPacket = {
+		command : 'INSERT_COMMENT',
 		p_content_idx : document.getElementById("popup_idx").innerHTML,
 		p_comment_idx : null,
 		user_id : document.getElementById("userId").innerHTML,
@@ -379,7 +396,7 @@ function onPopupWriteClick(clickedObj){
 		group_no : null
 	};
 	
-	sendAjax('post', '/insertCommentAction', jsonPacket, 'application/x-www-form-urlencoded')
+	sendAjax('post', '/commentAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
 		var receive = JSON.parse(result);
 
@@ -409,6 +426,7 @@ function onReplyWriteClick(clickedObj){
 	}
 	
 	jsonPacket = {
+		command : 'INSERT_COMMENT',
 		p_content_idx : document.getElementById("popup_idx").innerHTML,
 		p_comment_idx : commentNode.id,
 		user_id : document.getElementById("userId").innerHTML,
@@ -417,7 +435,7 @@ function onReplyWriteClick(clickedObj){
 		group_no : commentNode.firstChild.value
 	};
 	
-	sendAjax('post', '/insertCommentAction', jsonPacket, 'application/x-www-form-urlencoded')
+	sendAjax('post', '/commentAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
 		var receive = JSON.parse(result);
 
@@ -435,10 +453,11 @@ function onReplyWriteClick(clickedObj){
 function onCommentDeleteClick(clickedObj){
 	var commentNode = clickedObj.parentNode.parentNode.parentNode;
 	jsonPacket = {
+		command : 'DELETE_COMMENT',
 		comment_idx : commentNode.id
 	};
 	
-	sendAjax('post', '/deleteCommentAction', jsonPacket, 'application/x-www-form-urlencoded')
+	sendAjax('post', '/commentAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(result){
 		var receive = JSON.parse(result);
 

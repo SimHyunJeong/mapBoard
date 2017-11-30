@@ -3,12 +3,14 @@ var request;
 var response;
 
 var responsePacket;
+var model;
 
 exports.action = function(req, res, sqlConn)
 {
 	sqlConnection = sqlConn;
 	request = req;
 	response = res;
+	model = require('../../MySqlQueryModel.js');
 	
 	console.log('/loadContentsAction');
 
@@ -21,7 +23,6 @@ function loadContents() {
 	var conditions = null;
 	var values = []
 	
-	var model = require('../../MySqlQueryModel.js');
 	model.selectQuery(
 		sqlConnection, 
 		columns, 

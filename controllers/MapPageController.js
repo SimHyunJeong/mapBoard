@@ -21,45 +21,20 @@ module.exports = function(app, sqlConnection, upload)
 		console.log("/editContentPopup");
 	});
 
-	var contentModelsPath = '../models/mapModels/contentModels';
 	var commentModelsPath = '../models/mapModels/commentModels';
 	var imageModelsPath = '../models/mapModels/imageModels';
 	
 	// ---------- content ---------------------------------------------------
 
-	app.get('/loadContentsAction', function(request, response){
-		var model = require(contentModelsPath + '/LoadContentsActionModel.js');	
-		model.action(request, response, sqlConnection);
-	});
-	app.post('/selectContentAction', function(request, response){
-		var model = require(contentModelsPath + '/SelectContentActionModel.js');	
-		model.action(request, response, sqlConnection);
-	});
-	app.post('/insertContentAction', function(request, response){
-		var model = require(contentModelsPath + '/InsertContentActionModel.js');	
-		model.action(request, response, sqlConnection);
-	});
-	app.post('/deleteContentAction', function(request, response){
-		var model = require(contentModelsPath + '/DeleteContentActionModel.js');	
-		model.action(request, response, sqlConnection);
-	});
-	app.post('/updateContentAction', function(request, response){
-		var model = require(contentModelsPath + '/UpdateContentActionModel.js');	
+	app.post('/contentAction', function(request, response){
+		var model = require('../models/mapModels/ContentActionModel.js');
 		model.action(request, response, sqlConnection);
 	});
 
 	// ---------- comment ---------------------------------------------------
 
-	app.post('/loadCommentsAction', function(request, response){
-		var model = require(commentModelsPath + '/LoadCommentsActionModel.js');	
-		model.action(request, response, sqlConnection);
-	});
-	app.post('/insertCommentAction', function(request, response){
-		var model = require(commentModelsPath + '/InsertCommentActionModel.js');	
-		model.action(request, response, sqlConnection);
-	});
-	app.post('/deleteCommentAction', function(request, response){
-		var model = require(commentModelsPath + '/DeleteCommentActionModel.js');	
+	app.post('/commentAction', function(request, response){
+		var model = require('../models/mapModels/CommentActionModel.js');
 		model.action(request, response, sqlConnection);
 	});
 
