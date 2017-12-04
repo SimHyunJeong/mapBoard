@@ -135,7 +135,7 @@ function loadImages(){
 		p_content_idx : document.getElementById('popup_idx').innerHTML
 	}
 	
-	sendAjax('post', '/imageAction', jsonPacket, 'application/x-www-form-urlencoded')
+	sendAjax('post', '/loadImagesAction', jsonPacket, 'application/x-www-form-urlencoded')
 	.done(function(data){
 		var rows = JSON.parse(data);
 		var imageDiv = document.getElementById("popup_image");
@@ -299,7 +299,7 @@ function uploadImage(result){
 			return;
 		}
 
-		formData.append('command', 'UPLOAD_IMAGE');		
+		formData.append('command', 'UPLOAD_IMAGES');		
 		formData.append('p_content_idx', receive.content_idx);
 
 		sendAjax('post', '/imageAction', formData, 'multipart/form-data');

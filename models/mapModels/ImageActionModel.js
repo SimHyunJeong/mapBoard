@@ -11,7 +11,9 @@ exports.action = function(req, res, sqlConn)
 	model = require('../MySqlQueryModel.js');
 
 	console.log('/imageAction');
-
+	console.log(request.body.command);
+	console.log(request.body.p_content_idx);
+	
 	switch(request.body.command){
         case "LOAD_IMAGES" : {
             loadImages();	
@@ -21,7 +23,7 @@ exports.action = function(req, res, sqlConn)
 			insertImages();
             break;			
         }
-    }
+	}
 }
 
 function loadImages(id, pw){

@@ -39,19 +39,15 @@ module.exports = function(app, sqlConnection, upload)
 
 	// ---------- image ---------------------------------------------------
 	
-	app.post('/imageAction', function(request, response){
+	app.post('/imageAction', upload.array('uploadFiles'), function(request, response){
+		if(request.files == undefined){
+			return;
+		}
 		var model = require(mapModelsPath + '/ImageActionModel.js');	
 		model.action(request, response, sqlConnection);
 	});
 	app.post('/loadImagesAction', function(request, response){
-		var model = require(mapModelsPath + '/LoadImagesActionModel.js');	
-		model.action(request, response, sqlConnection);
-	});
-	app.post('/uploadImagesAction', upload.array('uploadFiles'), function(request, response){
-		if(request.files == undefined){
-			return;
-		}
-		var model = require(mapModelsPath + '/UploadImagesActionModel.js');	
+		var model = require(mapModelsPath + '/ImageActionModel.js');	
 		model.action(request, response, sqlConnection);
 	});
 	app.get('/showImageAction', function(request, response){

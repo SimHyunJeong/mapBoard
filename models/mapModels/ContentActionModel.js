@@ -103,7 +103,7 @@ function selectContentAction(err, rows){
 	}
 }
 
-function insertContent() {
+function createContent() {
 	var tableName = 'contents';
 	var columns = [
 		'user_id', 
@@ -127,19 +127,19 @@ function insertContent() {
 		tableName, 
 		columns, 
 		values, 
-		insertContentAction
+		createContentAction
 	);
 }
 
-function insertContentAction(err, result){
+function createContentAction(err, result){
 	if(err) {
-		console.log("insertContentAction error : " + err);
+		console.log("createContentAction error : " + err);
 		responsePacket = {command : "ERROR"};
 		response.end(JSON.stringify(responsePacket));
 		return;
 	}
 	if(result.affectedRows){
-		console.log("insertContentAction success");
+		console.log("createContentAction success");
 		responsePacket = {
 			command : "SUCCESSFUL",
 			content_idx : result.insertId
