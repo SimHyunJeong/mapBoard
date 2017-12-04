@@ -1,65 +1,54 @@
-﻿<HTML>
+<HTML>
 	<HEAD>
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
 		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+		
+		<script src="javascripts/LoginPage.js" type="text/javascript"></script>
+		<style>
+
+		div.absolute {
+		    position: absolute;
+		    top: 380px;
+		    left: 180px;
+		   
+		}
+</style>
 		<TITLE>LoginPage</TITLE>
 	</HEAD>
 	
 	<BODY>
-		<div style="position : absolute; top : 30%; left : 25%; width : 50%;">	
+		<div class="absolute">	
 			<div class="ui middle aligned center aligned grid">
 				<div class="column">
 					<h2 class="ui teal image header">
-						<div class="content">
+						<div class="content" style="font-size: 40pt; margin-bottom: 40px;">
 							Log-in to your account
 						</div>
 					</h2>
-					<form id="logInForm" class="ui large form" action="http://127.0.0.1:21002/logInAction" method="post">						
+					<form id="loginForm" class="ui large form" action="/loginAction" method="post">						
 						<div class="ui stacked segment">
 							<div class="field">
 								<div class="ui left icon input">
-									<i class="user icon"></i>
-									<input type="text" name="id" placeholder="ID" maxlength="20">
+									<input type="text" name="id" placeholder="ID" maxlength="20"  style="font-size: 30pt;">
 								</div>
 							</div>
-							<div class="field">
+							<div class="field" >
 								<div class="ui left icon input">
-									<i class="lock icon"></i>
-									<input type="password" name="pw" placeholder="Password" maxlength="20">
+									<input type="password" name="pw" placeholder="Password" maxlength="20" style="font-size: 30pt;">
 								</div>
 							</div>							
-							<div class="ui fluid large teal button" onclick="onLoginClick();">
+							<div class="ui fluid large teal button" onclick="onLoginClick();" style="font-size: 25pt; ">
 								Log-in
 							</div>
 						</div>
 					</form>
 
-					<div class="ui message">
+					<div class="ui message" style="font-size: 25pt;">
 						New to us? &nbsp <a href="./signUpPage">Sign Up</a>
 					</div>
 				</div>
 			</div>
 		</div>
-
-		<script>
-			function onLoginClick(){
-				var form = document.getElementById("logInForm");
-				var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/;
-
-				if(form.id.value == ""){
-					alert("id is empty");
-				}
-				else if(regExp.test(form.id.value)){
-					alert("can't use special character");
-				}
-				else if(form.pw.value == ""){
-					alert("password id empty");
-				}
-				else{
-					form.submit();
-				}
-			}
-		</script>
 	</BODY>
 </HTML>
