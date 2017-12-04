@@ -18,7 +18,7 @@ var serverPort = settingData[0].serverPort;
 
 // --- mysql설정
 var mySqlConnection = mysql.createConnection({
-	host : hostName,
+	host : settingData[0].sqlHostName,
 	port : settingData[0].sqlPort,
 	database : settingData[0].database,
 	user : settingData[0].user,
