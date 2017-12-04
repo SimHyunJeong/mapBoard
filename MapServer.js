@@ -5,6 +5,8 @@ var mysql = require('mysql');
 var session = require('express-session');
 var jsonFile = require('jsonFile');
 var multer = require('multer');
+var socketIo = require('socket.io');
+var socketEvent = require('./socket.js');
 
 // --- setting 불러오기
 var fileName = './setting.json';
@@ -73,7 +75,9 @@ app.use(function(request, response, next){
 var router = require('./Index')(app, mySqlConnection, upload);
 
 // --- 서버 실행
-app.listen(serverPort, function(){
+var server = app.listen(serverPort, function(){
 	console.log('Server running at http://' + hostName +':'+ serverPort);	
 });
 
+var io = new socketIo(server);
+socketEvent(io);

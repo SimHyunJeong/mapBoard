@@ -8,6 +8,8 @@ var jsonPacket;
 var map;
 var tileLayer;
 
+var socket = io();
+
 // 가로는 타일 크기 이상 범위지정이 되는데 세로는 타일의 크기 이상 지정이 안된다
 //var mapBoundStart = L.latLng(-10000, -500);
 //var mapBoundEnd = L.latLng(10000, 500);
@@ -41,6 +43,17 @@ function init(){
 
 	map.on('click', onMapClick);
 	map.on('mousemove', onMouseMove);
+
+	socket.on('chatToClient', function(data){
+		var chatArea = document.getElementById('chatArea');
+		chatArea.value += data + '\n';
+	});
+}
+
+function onChatInputClick(){
+	var chatInput = document.getElementById('chatInput');
+	socket.emit('chatToServer', chatInput.value);
+	chatInput.value = '';
 }
 
 function makeMarkers(result){
