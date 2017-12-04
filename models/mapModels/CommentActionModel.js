@@ -69,7 +69,7 @@ function loadCommentsAction(err, rows){
 	}
 }
 
-function insertComment(){
+function createComment(){
 	var p_content_idx = request.body.p_content_idx;
 	var p_comment_idx = request.body.p_comment_idx;
 	var user_id = request.body.user_id;
@@ -113,19 +113,19 @@ function insertComment(){
 		tableName, 
 		columns, 
 		values, 
-		insertCommentAction
+		createCommentAction
 	);
 }
 
-function insertCommentAction(err, result){
+function createCommentAction(err, result){
 	if(err) {
-		console.log("insertCommentAction error : " + err);
+		console.log("createCommentAction error : " + err);
 		responsePacket = {command : "ERROR"};
 		response.end(JSON.stringify(responsePacket));
 		return;
 	}
 	if(result.affectedRows){
-		console.log("insertCommentAction success");
+		console.log("createCommentAction success");
 		responsePacket = {command : "SUCCESSFUL"};
 		response.end(JSON.stringify(responsePacket));		
 	}

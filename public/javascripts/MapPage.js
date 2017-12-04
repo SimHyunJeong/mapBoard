@@ -339,7 +339,7 @@ function onPopupDeleteClick() {
 
 function onPopupUpdateClick(){
 	jsonPacket = {
-		command : 'DELETE_CONTENT',		
+		command : 'UPDATE_CONTENT',		
 		title : document.getElementById('popup_edit_title').value,
 		content : document.getElementById('popup_edit_content').value,
 		content_idx : document.getElementById("popup_edit_idx").innerHTML	
