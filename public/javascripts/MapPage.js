@@ -10,6 +10,8 @@ var tileLayer;
 
 var socket = io();
 
+var uid;
+
 // 가로는 타일 크기 이상 범위지정이 되는데 세로는 타일의 크기 이상 지정이 안된다
 //var mapBoundStart = L.latLng(-10000, -500);
 //var mapBoundEnd = L.latLng(10000, 500);
@@ -44,15 +46,27 @@ function init(){
 	map.on('click', onMapClick);
 	map.on('mousemove', onMouseMove);
 
-	socket.on('chatToClient', function(data){
+	socket.on('connect', function(){
+		$.get("http://ipinfo.io", function(response) {
+			var data = {
+				country : response.country,
+				socketId : socket.id
+			}
+			socket.emit('login', data);
+		}, "json");
+	});
+
+	socket.on('chat', function(data){
 		var chatArea = document.getElementById('chatArea');
 		chatArea.value += data + '\n';
 	});
+
+	uid = document.getElementById("userId").innerHTML;
 }
 
 function onChatInputClick(){
 	var chatInput = document.getElementById('chatInput');
-	socket.emit('chatToServer', chatInput.value);
+	socket.emit('chat', uid + ' : ' + chatInput.value);
 	chatInput.value = '';
 }
 
@@ -131,7 +145,6 @@ function showContentPopup(result){
 	
 	loadImages();
 	
-	var uid = document.getElementById("userId").innerHTML;
 	var author = document.getElementById("popup_id").innerHTML;
 
 	if (uid == author) {
@@ -229,7 +242,7 @@ function makeComments(rows){
 				if(rows[i].depth == 0){
 					html += '<a class="reply" name="' + rows[i].comment_idx + '" onclick="onReplyClick(this)">Reply</a>';
 				}
-				if(rows[i].user_id == document.getElementById('userId').innerHTML){
+				if(rows[i].user_id == uid){
 					html += '<a class="reply" onclick="onCommentDeleteClick(this)">Delete</a>'; 
 				}
 				html += '</div>';
@@ -290,7 +303,7 @@ function onPopupSaveClick() {
 
 	jsonPacket = {
 		command : 'INSERT_CONTENT',		
-		user_id : document.getElementById("userId").innerHTML,
+		user_id : uid,
 		title : title,
 		content : content,
 		lat : popup.getLatLng().lat,
@@ -406,7 +419,7 @@ function onPopupWriteClick(clickedObj){
 		command : 'INSERT_COMMENT',
 		p_content_idx : document.getElementById("popup_idx").innerHTML,
 		p_comment_idx : null,
-		user_id : document.getElementById("userId").innerHTML,
+		user_id : uid,
 		comment : comment,
 		depth : 0,
 		group_no : null
@@ -445,7 +458,7 @@ function onReplyWriteClick(clickedObj){
 		command : 'INSERT_COMMENT',
 		p_content_idx : document.getElementById("popup_idx").innerHTML,
 		p_comment_idx : commentNode.id,
-		user_id : document.getElementById("userId").innerHTML,
+		user_id : uid,
 		comment : document.getElementById('comments_comment' + commentNode.id).value,
 		depth : 1,
 		group_no : commentNode.firstChild.value
