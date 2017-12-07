@@ -22,7 +22,7 @@ function init(){
 		$('.ui.sidebar').sidebar('toggle');
 	});
 
-	map = L.map('map').setView([0, 0], 1);
+	map = L.map('map').setView([0, 0], 1.5);
 
 	// 범위 지정 -- 안하면 지도가 반복적으로 나오지만 지도마다 좌표가 다르다
 	var layerBoundStart = L.latLng(-85, -180);
@@ -215,7 +215,7 @@ function makeComments(rows){
 		var updateTime = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 		var html = '';
 
-		html += '<div class="comment" id="' + rows[i].comment_idx + '">';
+		html += '<div class="comment" style="font-size : 25pt;"id="' + rows[i].comment_idx + '">';
 			html += '<input id="group_no" type="hidden" value="' + rows[i].group_no + '"/>';
 			html += '<div class="content">';
 				html += '<label class="author">' + rows[i].user_id + '</label>';
@@ -236,9 +236,9 @@ function makeComments(rows){
 				html += '<form class ui reply form>';
 					html += '<div class="field">';
 						html += '<textarea id="comments_comment' + rows[i].comment_idx + 
-								'" style="display:none; overflow:auto; width:60%;" maxlength="99"></textarea>' + 
+								'" style="display:none;  width:60%; height: 40px; maxlength="99"></textarea>' + 
 								'<input type="hidden" id="comments_write_button' + rows[i].comment_idx + '" ' + 
-								'value="Write" style="width : 30%;" onclick="onReplyWriteClick(this)" class="ui primary button">' + 
+								'value="Write" style="width : 30%; " onclick="onReplyWriteClick(this)" class="ui primary button">' + 
 								'<br>';
 					html += '</div>';
 				html += '</form>';
