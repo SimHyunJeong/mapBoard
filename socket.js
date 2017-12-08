@@ -6,7 +6,8 @@ module.exports = function(io){
         
         socket.on('chat', function(data){ //클라이언트에서 chatToServer 이벤트 요청 시
             console.log('Socket : ' + data);
-            io.emit('chat', data);
+            var myRoom = Object.keys(chatRooms)[0];
+            io.sockets.to(socket.rooms[myRoom]).emit('chat', data);
         });
 
         socket.on('login', function(data){
@@ -16,6 +17,7 @@ module.exports = function(io){
             else{
                 chatRooms[data.country].push(data.socketId);
             }
+            socket.join(data.country);
         });
 
         socket.on('disconnect', function(){
@@ -32,7 +34,13 @@ module.exports = function(io){
                     }
                 }
             }
-            chatRooms[room].splice(index, 1);
+            try{
+                chatRooms[room].splice(index, 1);
+                socket.leave(data.country);                
+            }
+            catch(exception){
+                console.log(exception);
+            }
         });
     });
 };

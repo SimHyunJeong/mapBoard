@@ -10,6 +10,21 @@ var tileLayer;
 
 var socket = io();
 
+socket.on('connect', function(){
+	$.get("http://ipinfo.io", function(response) {
+		var data = {
+			country : response.country,
+			socketId : socket.id
+		}
+		socket.emit('login', data);
+		document.getElementById('chatLocation').innerHTML = response.country;
+	}, "json");
+});
+socket.on('chat', function(data){
+	var chatArea = document.getElementById('chatArea');
+	chatArea.value += data + '\n';
+});
+
 var uid;
 
 // 가로는 타일 크기 이상 범위지정이 되는데 세로는 타일의 크기 이상 지정이 안된다
@@ -45,22 +60,7 @@ function init(){
 
 	map.on('click', onMapClick);
 	map.on('mousemove', onMouseMove);
-
-	socket.on('connect', function(){
-		$.get("http://ipinfo.io", function(response) {
-			var data = {
-				country : response.country,
-				socketId : socket.id
-			}
-			socket.emit('login', data);
-		}, "json");
-	});
-
-	socket.on('chat', function(data){
-		var chatArea = document.getElementById('chatArea');
-		chatArea.value += data + '\n';
-	});
-
+		
 	uid = document.getElementById("userId").innerHTML;
 }
 
