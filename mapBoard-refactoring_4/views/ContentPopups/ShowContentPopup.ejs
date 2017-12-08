@@ -8,7 +8,7 @@
         <TITLE>CreateContentPopup</TITLE>
     </HEAD>
     <BODY>
-        <div style='width : 600px; height : 600px; overflow-y : scroll;'>
+        <div style='width : 500px; height : 600px; font-size: 25pt; overflow-y : scroll;'>
 
         <strong>Idx : </strong>
         <label id="popup_idx"><%= row.content_idx %></label>
@@ -24,7 +24,7 @@
 
         <strong>Content</strong>
         <br>
-        <div id="popup_content" style="width : 100%;"><%= row.content %></div>
+        <div id="popup_content" style="width : 100%; font-size: 25pt;"><%= row.content %></div>
         <div id="popup_image" style="width : 100%;"></div> 
         <div id="popup_download" style="width : 100%;"></div>         
         <br>
@@ -36,15 +36,15 @@
         
         <input type="hidden" id="edit_button" value="Edit" style="width : 30%;" onclick="onPopupEditClick()" class="ui primary button">
         <input type="hidden" id="delete_button" value="Delete" style="width : 30%;" onclick="onPopupDeleteClick()" class="ui secondary button">
-        <input type="button" id="close_button" value="Close" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button">
+        <input type="button" id="close_button" value="Close" style="width : 30%; " onclick="onPopupCloseClick()" class="ui secondary button">
         <br><br>
     
         <strong>Comments</strong>
         <br>
-        <textarea id="popup_comment_input" style="overflow:auto; width:60%; height:20px;" maxlength="99"></textarea>
-        <input type="button" id="write_button" value="Write" style="width : 30%;" onclick="onPopupWriteClick(this)" class="ui primary button">
+        <textarea id="popup_comment_input" style="overflow:auto; width:60%; height:40px;" maxlength="99"></textarea>
+        <input type="button" id="write_button" value="Write" style="width : 30% ;" onclick="onPopupWriteClick(this)" class="ui primary button">
         <br>
 
-        <div id='popup_comment' style='width : 100%;'></div>
+        <div id='popup_comment' style='width : 100%; font-size: 25pt;'></div>
     </BODY>
 </HTML>

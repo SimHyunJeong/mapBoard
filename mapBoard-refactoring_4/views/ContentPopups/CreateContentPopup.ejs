@@ -10,14 +10,15 @@
         <TITLE>ShowContentPopup</TITLE>
     </HEAD>
     <BODY>
-        <strong>Title : </strong>
+     <div style='width : 500px; height : 680px; font-size: 25pt; '>
+        <strong style="font-size: 25pt;">Title : </strong>
         <br>
-        <input style="width : 100%;" type="text" id="title" maxLength="40" size="40" name="id" value="">
+        <input style="width : 80%;" type="text" id="title" maxLength="40" size="50" name="id" value="">
         <br><br>
         
         <strong>Context : </strong>
         <br>
-        <textarea style="overflow:auto; width:300px; height:75px;" name="textarea" id="content" rows="5" cols="40"></textarea>
+        <textarea style="overflow:auto; width : 80%; height:170px;" name="textarea" id="content" rows="5" cols="40"></textarea>
         <br><br>
         
         <form id="uploadForm" method="post" action="/upload" enctype="multipart/form-data">
@@ -26,7 +27,8 @@
         </form>
         <br>
 
-        <input type="button" style="width : 30%;" onclick="onPopupSaveClick()" class="ui primary button" value="Save">
-        <input type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button" value="Close">
+        <input type="button" style="width : 30%; " onclick="onPopupSaveClick()" class="ui primary button" value="Save">
+        <input type="button" style="width : 30%; " onclick="onPopupCloseClick()" class="ui secondary button" value="Close">
+        </div>
     </BODY>
 </HTML>
