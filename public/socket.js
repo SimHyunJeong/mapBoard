@@ -39,7 +39,7 @@ module.exports = function(io){
                 socket.leave(data.country);                
             }
             catch(exception){
-                console.log(exception);
+                //console.log(exception);
             }
         });
     });

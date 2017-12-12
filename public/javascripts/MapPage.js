@@ -39,7 +39,8 @@ function init(){
 		$('.ui.sidebar').sidebar('toggle');
 	});
 
-	map = L.map('map').setView([0, 0], 1);
+	//map = L.map('map').setView([0, 0], 1);
+	map = L.map('map').setView([37.53065642334109, 126.92155632377083], 20);
 
 	// 범위 지정 -- 안하면 지도가 반복적으로 나오지만 지도마다 좌표가 다르다
 	var layerBoundStart = L.latLng(-85, -180);

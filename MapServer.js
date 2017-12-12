@@ -6,7 +6,7 @@ var session = require('express-session');
 var jsonFile = require('jsonFile');
 var multer = require('multer');
 var socketIo = require('socket.io');
-var socketEvent = require('./socket.js');
+var socketEvent = require('./public/socket.js');
 
 // --- setting 불러오기
 var fileName = './setting.json';
