@@ -10,36 +10,10 @@ var tileLayer;
 
 var socket = io();
 
-socket.on('connect', function(){
-	$.get("http://ipinfo.io", function(response) {
-		var data = {
-			country : response.country,
-			socketId : socket.id
-		}
-		socket.emit('login', data);
-		document.getElementById('chatLocation').innerHTML = response.country;
-	}, "json");
-});
-socket.on('chat', function(data){
-	var chatArea = document.getElementById('chatArea');
-	chatArea.value += data + '\n';
-});
-
 var uid;
 
-// 가로는 타일 크기 이상 범위지정이 되는데 세로는 타일의 크기 이상 지정이 안된다
-//var mapBoundStart = L.latLng(-10000, -500);
-//var mapBoundEnd = L.latLng(10000, 500);
-//var mapBounds = L.latLngBounds(mapBoundStart, mapBoundEnd);
-//map.setMaxBounds(mapBounds);
-
 function init(){
-	// 사이드 메뉴 토글
-	$('#show_sidebar').click(function(){
-		$('.ui.sidebar').sidebar('toggle');
-	});
-
-	map = L.map('map').setView([37.55, 126.97], 12);
+	map = L.map('map').setView([37.53065642334109, 126.92155632377083], 20);
 
 	// 범위 지정 -- 안하면 지도가 반복적으로 나오지만 지도마다 좌표가 다르다
 	var layerBoundStart = L.latLng(-85, -180);
@@ -61,13 +35,7 @@ function init(){
 	map.on('click', onMapClick);
 	map.on('mousemove', onMouseMove);
 		
-	uid = document.getElementById("userId").innerHTML;
-}
-
-function onChatInputClick(){
-	var chatInput = document.getElementById('chatInput');
-	socket.emit('chat', uid + ' : ' + chatInput.value);
-	chatInput.value = '';
+	uid = document.getElementById("userId").value;
 }
 
 function makeMarkers(result){

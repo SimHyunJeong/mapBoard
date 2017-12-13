@@ -1,6 +1,6 @@
 [
     {
-      "hostName" : "192.168.0.65",
+      "hostName" : "192.168.0.34",
       "sqlHostName" : "192.168.0.34",
       "sqlPort" : "3306",
       "serverPort" : "21002",

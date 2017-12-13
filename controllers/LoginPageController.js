@@ -1,7 +1,7 @@
 module.exports = function(app, sqlConnection)
 {
 	app.get('/',function(request,response){
-		response.redirect('/loginPage');			
+		response.redirect('/mapPage');			
 	});
 	app.get('/loginPage',function(request,response){
 		response.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');

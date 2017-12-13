@@ -2,15 +2,12 @@ module.exports = function(app, sqlConnection, upload)
 {
   	app.get('/mapPage', function(request, response){
 		response.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-		if(!request.session.USER){
-			response.redirect('/');			
-		}
-		else{			
-			response.render('MapPage.ejs', {
-				user : request.session.USER,
-			});
-			console.log('/mapPage');
-		}
+					
+		var visitor = {id : 'visitor', pw : '123'};
+		response.render('MapPage.ejs', {
+			user : visitor
+		});
+		console.log('/mapPage');
 	});
 	app.get('/createContentPopup', function(request, response){
 		response.render('ContentPopups/CreateContentPopup.ejs');
