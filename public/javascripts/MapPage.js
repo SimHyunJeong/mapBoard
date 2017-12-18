@@ -8,8 +8,6 @@ var jsonPacket;
 var map;
 var tileLayer;
 
-var socket = io();
-
 var uid;
 
 function init(){
@@ -113,10 +111,9 @@ function showContentPopup(result){
 	
 	loadImages();
 	
-	var author = document.getElementById("popup_id").innerHTML;
+	var author = 'admin';
 
 	if (uid == author) {
-		document.getElementById("edit_button").type = 'button';
 		document.getElementById("delete_button").type = 'button';
 	}
 

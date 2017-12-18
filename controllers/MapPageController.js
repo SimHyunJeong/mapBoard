@@ -2,8 +2,13 @@ module.exports = function(app, sqlConnection, upload)
 {
   	app.get('/mapPage', function(request, response){
 		response.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-					
-		var visitor = {id : 'visitor', pw : '123'};
+		var visitor;
+		if(request.session.USER){
+			visitor = request.session.USER;
+		}
+		else{
+			visitor = {id : 'visitor', pw : '123'};
+		}
 		response.render('MapPage.ejs', {
 			user : visitor
 		});

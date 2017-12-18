@@ -10,25 +10,25 @@
         <TITLE>ShowContentPopup</TITLE>
     </HEAD>
     <BODY>
-     <div style='width : 500px; height : 680px; font-size: 25pt; margin-left: 60px;'>
-        <strong style="font-size: 25pt;">Title : </strong>
-        <br>
-        <input style="width : 80%;" type="text" id="title" maxLength="40" size="50" name="id" value="">
-        <br><br>
-        
-        <strong>Context : </strong>
-        <br>
-        <textarea style="overflow:auto; width : 80%; height:170px;" name="textarea" id="content" rows="5" cols="40"></textarea>
-        <br><br>
-        
-        <form id="uploadForm" method="post" action="/upload" enctype="multipart/form-data">
-            파일 선택 : 
-            <input type="file" id="uploadFiles" name="uploadFiles" multiple>
-        </form>
-        <br>
+        <div style='width : 500px; height : 680px; font-size: 2rem; margin : 10%;'>
+            <div class="inline field">
+                <input id="title" type="text" style="width : 80%;" placeholder="Name (Company)" maxLength="40" value="">
+            </div>
+            <br>
+            
+            <div class="inline field">
+                <textarea style="overflow:auto; width : 80%; height:50%;"  placeholder="Context" id="content" rows="5" cols="40"></textarea>
+            </div>
+            <br>
 
-        <input type="button" style="width : 30%; " onclick="onPopupSaveClick()" class="ui primary button" value="Save">
-        <input type="button" style="width : 30%; " onclick="onPopupCloseClick()" class="ui secondary button" value="Close">
+            <form id="uploadForm" method="post" action="/upload" enctype="multipart/form-data">
+                이미지 선택 : 
+                <input type="file" id="uploadFiles" name="uploadFiles" multiple style="width : 80%">
+            </form>
+            <br>
+
+            <input type="button" style="width : 30%; " onclick="onPopupSaveClick()" class="ui primary button" value="Save">
+            <input type="button" style="width : 30%; " onclick="onPopupCloseClick()" class="ui secondary button" value="Close">
         </div>
     </BODY>
 </HTML>

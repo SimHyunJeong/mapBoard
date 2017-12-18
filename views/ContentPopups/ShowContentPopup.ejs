@@ -8,43 +8,33 @@
         <TITLE>CreateContentPopup</TITLE>
     </HEAD>
     <BODY>
-        <div style='width : 500px; height : 600px; font-size: 25pt; overflow-y : scroll;'>
+        <div style='width : 500px; height : 680px; font-size: 2rem; margin-top : 10%; overflow-y : scroll;'>
+            <label id="popup_idx" style="display:none;"><%= row.content_idx %></label>
 
-        <strong>Idx : </strong>
-        <label id="popup_idx"><%= row.content_idx %></label>
-        <br>
+            <strong>Name(Company)</strong>
+            <br>
+            <label id="popup_title"><%= row.title %></label>
+            <br><br>
 
-        <strong>Title : </strong>
-        <label id="popup_title"><%= row.title %></label>
-        <br>
-
-        <strong>User : </strong>
-        <label id="popup_id"><%= row.user_id %></label>
-        <br><br>
-
-        <strong>Content</strong>
-        <br>
-        <div id="popup_content" style="width : 100%; font-size: 25pt;"><%= row.content %></div>
-        <div id="popup_image" style="width : 100%;"></div> 
-        <div id="popup_download" style="width : 100%;"></div>         
-        <br>
+            <strong>Content</strong>
+            <br>
+            <div id="popup_content" style="width : 100%;"><%= row.content %></div>
+            <br>
+            <div id="popup_image" style="width : 100%;"></div> 
+            <div id="popup_download" style="width : 100%;"></div>
+            <br>
+            
+            <input type="hidden" id="delete_button" value="Delete" style="width : 30%;" onclick="onPopupDeleteClick()" class="ui secondary button">
+            <input type="button" id="close_button" value="Close" style="width : 30%; " onclick="onPopupCloseClick()" class="ui secondary button">
+            <br><br>
         
-        <strong>Updated time</strong>
-        <br>
-        <label id="popup_datetime"><%= row.datetime %></label>
-        <br><br>
-        
-        <input type="hidden" id="edit_button" value="Edit" style="width : 30%;" onclick="onPopupEditClick()" class="ui primary button">
-        <input type="hidden" id="delete_button" value="Delete" style="width : 30%;" onclick="onPopupDeleteClick()" class="ui secondary button">
-        <input type="button" id="close_button" value="Close" style="width : 30%; " onclick="onPopupCloseClick()" class="ui secondary button">
-        <br><br>
-    
-        <strong>Comments</strong>
-        <br>
-        <textarea id="popup_comment_input" style="overflow:auto; width:60%; height:40px;" maxlength="99"></textarea>
-        <input type="button" id="write_button" value="Write" style="width : 30% ;" onclick="onPopupWriteClick(this)" class="ui primary button">
-        <br>
+            <strong>Comments</strong>
+            <br>
+            <textarea id="popup_comment_input" style="overflow:auto; width:60%;" maxlength="99"></textarea>
+            <input type="button" id="write_button" value="Write" style="width :30% ;" onclick="onPopupWriteClick(this)" class="ui primary button">
+            <br>
 
-        <div id='popup_comment' style='width : 100%; font-size: 25pt;'></div>
+            <div id='popup_comment' style='width : 100%;'></div>
+        </div>
     </BODY>
 </HTML>
