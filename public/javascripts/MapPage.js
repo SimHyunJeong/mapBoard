@@ -8,6 +8,7 @@ var jsonPacket;
 var map;
 var tileLayer;
 
+var adminId = 'admin';
 var uid;
 
 function init(){
@@ -111,9 +112,7 @@ function showContentPopup(result){
 	
 	loadImages();
 	
-	var author = 'admin';
-
-	if (uid == author) {
+	if (uid == adminId) {
 		document.getElementById("delete_button").type = 'button';
 	}
 
@@ -159,11 +158,6 @@ function loadComments(){
 		document.getElementById('popup_comment').innerHTML = commentsHtml;
 
 		addCommentsComment(comments);
-
-		if (uid == author) {
-			document.getElementById("edit_button").type = 'button';
-			document.getElementById("delete_button").type = 'button';
-		}
 	});
 }
 
@@ -193,7 +187,7 @@ function makeComments(rows){
 		var updateTime = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 		var html = '';
 
-		html += '<div class="comment" id="' + rows[i].comment_idx + '">';
+		html += '<div style="font-size: 2rem;" class="comment" id="' + rows[i].comment_idx + '">';
 			html += '<input id="group_no" type="hidden" value="' + rows[i].group_no + '"/>';
 			html += '<div class="content">';
 				html += '<label class="author">' + rows[i].user_id + '</label>';
@@ -202,24 +196,7 @@ function makeComments(rows){
 				html += '</div>'
 				html += '<div class="text">'
 						+ rows[i].comment 
-						+ '</div>'
-				html += '<div class="actions">';
-				if(rows[i].depth == 0){
-					html += '<a class="reply" name="' + rows[i].comment_idx + '" onclick="onReplyClick(this)">Reply</a>';
-				}
-				if(rows[i].user_id == uid){
-					html += '<a class="reply" onclick="onCommentDeleteClick(this)">Delete</a>'; 
-				}
-				html += '</div>';
-				html += '<form class ui reply form>';
-					html += '<div class="field">';
-						html += '<textarea id="comments_comment' + rows[i].comment_idx + 
-								'" style="display:none; overflow:auto; width:60%;" maxlength="99"></textarea>' + 
-								'<input type="hidden" id="comments_write_button' + rows[i].comment_idx + '" ' + 
-								'value="Write" style="width : 30%;" onclick="onReplyWriteClick(this)" class="ui primary button">' + 
-								'<br>';
-					html += '</div>';
-				html += '</form>';
+						+ '</div>';
 			html += '</div>';
 			html += '<div id="comments_group' + rows[i].group_no + '" ' +  'class="comments"></div>'
 		html += '</div>';
@@ -401,75 +378,11 @@ function onPopupWriteClick(clickedObj){
 			alert("Something wrong on your post. Please contact to server manager.");
 		}
 
+		document.getElementById("popup_comment_input").value = "";
 		loadComments();		
 	});
 }
 
-function onReplyWriteClick(clickedObj){
-	var commentNode = clickedObj.parentNode.parentNode.parentNode.parentNode;
-	var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/;
-	var comment = document.getElementById('comments_comment' + commentNode.id).value;
-
-	if(comment == ""){
-		alert("comment is empty");
-		return;
-	}
-	else if(regExp.test(comment)){
-		alert("can't use special character");
-		return;
-	}
-	
-	jsonPacket = {
-		command : 'INSERT_COMMENT',
-		p_content_idx : document.getElementById("popup_idx").innerHTML,
-		p_comment_idx : commentNode.id,
-		user_id : uid,
-		comment : document.getElementById('comments_comment' + commentNode.id).value,
-		depth : 1,
-		group_no : commentNode.firstChild.value
-	};
-	
-	sendAjax('post', '/commentAction', jsonPacket, 'application/x-www-form-urlencoded')
-	.done(function(result){
-		var receive = JSON.parse(result);
-
-		if (receive.command == "SUCCESSFUL") {
-			alert("Your comment has been created successfully.");
-		}
-		else {
-			alert("Something wrong on your post. Please contact to server manager.");
-		}
-
-		loadComments();
-	});
-}
-
-function onCommentDeleteClick(clickedObj){
-	var commentNode = clickedObj.parentNode.parentNode.parentNode;
-	jsonPacket = {
-		command : 'DELETE_COMMENT',
-		comment_idx : commentNode.id
-	};
-	
-	sendAjax('post', '/commentAction', jsonPacket, 'application/x-www-form-urlencoded')
-	.done(function(result){
-		var receive = JSON.parse(result);
-
-		if (receive.command == "SUCCESSFUL") {
-			alert("Your comment has been deleted successfully.");
-		}
-		else {
-			alert("Something wrong on your post. Please contact to server manager.");
-		}
-
-		loadComments();
-	});
-}
-
-function onReplyClick(clickedObj){
-	document.getElementById('comments_comment' + clickedObj.name).style.display = "block";
-	document.getElementById('comments_write_button' + clickedObj.name).type = "button";
-}
 
 function sendAjax(type, url, data, enctype, successFunction, errorFunction){
 	if(errorFunction == undefined){

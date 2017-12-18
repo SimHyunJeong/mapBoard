@@ -30,8 +30,10 @@
         
             <strong>Comments</strong>
             <br>
-            <textarea id="popup_comment_input" style="overflow:auto; width:60%;" maxlength="99"></textarea>
-            <input type="button" id="write_button" value="Write" style="width :30% ;" onclick="onPopupWriteClick(this)" class="ui primary button">
+            <div class="ui action input" style='width : 100%;'>
+                <textarea id="popup_comment_input" placeholder="Input Comment" style="width : 70%;"></textarea>
+                <input type="button" id="write_button" value="Write" style="width : 30%;" onclick="onPopupWriteClick(this)" class="ui primary button">
+            </div>
             <br>
 
             <div id='popup_comment' style='width : 100%;'></div>
