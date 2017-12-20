@@ -1,9 +1,9 @@
 [
     {
-      "hostName" : "192.168.0.34",
-      "sqlHostName" : "192.168.0.34",
+      "hostName" : "192.168.219.101",
+      "sqlHostName" : "192.168.219.101",
       "sqlPort" : "3306",
-      "serverPort" : "21002",
+      "serverPort" : "80",
       "database" : "mapdb",
       "user" : "mapuser",
       "password" : "jkjkiii"

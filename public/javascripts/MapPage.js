@@ -11,6 +11,7 @@ var tileLayer;
 var socket = io();
 
 socket.on('connect', function(){
+	/*
 	$.get("http://ipinfo.io", function(response) {
 		var data = {
 			country : response.country,
@@ -19,6 +20,15 @@ socket.on('connect', function(){
 		socket.emit('login', data);
 		document.getElementById('chatLocation').innerHTML = response.country;
 	}, "json");
+	*/
+	$.getJSON('//freegeoip.net/json/?callback=?', function(response) {
+		var data = {
+			country : response.country_code,
+			socketId : socket.id
+		}
+		socket.emit('login', data);
+		document.getElementById('chatLocation').innerHTML = response.country_code;
+	});
 });
 socket.on('chat', function(data){
 	var chatArea = document.getElementById('chatArea');
@@ -249,11 +259,11 @@ function makeComments(rows){
 				html += '</div>';
 				html += '<form class ui reply form>';
 					html += '<div class="field">';
-						html += '<textarea id="comments_comment' + rows[i].comment_idx + 
+						html += '<div class="ui action input" style="width : 100%;"><textarea id="comments_comment' + rows[i].comment_idx + 
 								'" style="display:none; overflow:auto; width:60%;" maxlength="99"></textarea>' + 
 								'<input type="hidden" id="comments_write_button' + rows[i].comment_idx + '" ' + 
 								'value="Write" style="width : 30%;" onclick="onReplyWriteClick(this)" class="ui primary button">' + 
-								'<br>';
+								'</div><br>';
 					html += '</div>';
 				html += '</form>';
 			html += '</div>';
@@ -436,13 +446,13 @@ function onPopupWriteClick(clickedObj){
 		else {
 			alert("Something wrong on your post. Please contact to server manager.");
 		}
-
+		document.getElementById('popup_comment_input').value = '';
 		loadComments();		
 	});
 }
 
 function onReplyWriteClick(clickedObj){
-	var commentNode = clickedObj.parentNode.parentNode.parentNode.parentNode;
+	var commentNode = clickedObj.parentNode.parentNode.parentNode.parentNode.parentNode;
 	var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/;
 	var comment = document.getElementById('comments_comment' + commentNode.id).value;
 
@@ -510,7 +520,7 @@ function onReplyClick(clickedObj){
 function sendAjax(type, url, data, enctype, successFunction, errorFunction){
 	if(errorFunction == undefined){
 		errorFunction = function(result) {
-			alert('status : ' + result.status + " : " + result.description);
+			//alert('status : ' + result.status + " : " + result.description);
 		};
 	}
 

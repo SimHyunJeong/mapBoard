@@ -24,14 +24,16 @@
 		<div class="ui sidebar vertical menu">
 			<a id="userId" name="userId" class="item"><%= user.id %></a>
 			<a id="logout" class="item" href="./logOutAction">log-out</a>
-			<a class="item" href="./mapPage">map</a>
+			<p>
 			<div class="item">
 				<label id='chatLocation'></label>
 				<br><br>
 				<textarea id='chatArea' style='width : 100%; height : 50%;' readonly='readonly'></textarea>
 				<br><br>
-				<input id='chatInput' type='text' style='width : 65%;'/>
-				<input id='chatInputButton' type='button' value='input' style='width : 30%;' onclick='onChatInputClick()'/>
+				<div class="ui action input" style='width : 100%;'>
+					<input id='chatInput' type='text' style='width : 65%;'/>
+					<input id='chatInputButton' type='button' class="ui primary button" value='input' style='width : 30%;' onclick='onChatInputClick()'/>
+				</div>
 			</div>
 		</div>
 		<div class="pusher">
@@ -41,9 +43,12 @@
 						<i class="content icon"></i>
 					</a>
 				</div> 
+				<div style='width : 100%; text-align:center; margin-top: 5%; margin-bottom: 5%'>
+					<h style='font-size:2rem;'>Map Board</h>
+				</div> 
 				<div class="right item">
-					<input type="text" id="lat" name="lat"/>
-					<input type="text" id="lng" name="lng"/>
+					<input type="hidden" id="lat" name="lat"/>
+					<input type="hidden" id="lng" name="lng"/>
 				</div>
 			</div>
 

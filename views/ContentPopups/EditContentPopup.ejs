@@ -8,21 +8,24 @@
         <TITLE>EditContentPopup</TITLE>
     </HEAD>
     <BODY>
-        <strong>idx : </strong>
-        <label id="popup_edit_idx"></label>
-        <br>
+        <div style='width : 600px; height : 600px; font-size: 2rem; margin : 10%; overflow-y : scroll;'>
 
-        <strong>Title</strong>
-        <br>
-        <input style="width : 100%;" type="text" id="popup_edit_title" maxLength="40" size="40" name="id" value="">
-        <br><br>
+            <strong>idx : </strong>
+            <label id="popup_edit_idx"></label>
+            <br>
 
-        <strong>Context</strong>
-        <br>
-        <textarea style="overflow:auto; width:300px; height:75px;" name="textarea" id="popup_edit_content" rows="5" cols="40"></textarea>
-        <br><br>
-        
-        <input type="button" style="width : 30%;" onclick="onPopupUpdateClick()" class="ui primary button" value="Update">
-        <input type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button" value="Close">
+            <div class="inline field">
+                <input id="popup_edit_title" type="text" style="width : 80%;" placeholder="title" maxLength="40" value="">
+            </div>
+            <br>
+            
+            <div class="inline field">
+                <textarea id="popup_edit_content" style="overflow:auto; width:80%; height:50%;" placeholder="content" rows="5" cols="40"></textarea>
+            </div>
+            <br>
+
+            <input type="button" style="width : 30%;" onclick="onPopupUpdateClick()" class="ui primary button" value="Update">
+            <input type="button" style="width : 30%;" onclick="onPopupCloseClick()" class="ui secondary button" value="Close">
+        </div>
     </BODY>
 </HTML>
