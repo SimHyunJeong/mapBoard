@@ -3,11 +3,11 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var mysql = require('mysql');
 var session = require('express-session');
-var jsonFile = require('jsonFile');
+var jsonFile = require('jsonfile');
 var multer = require('multer');
 
 // --- setting 불러오기
-var fileName = './setting.json';
+var fileName = './Setting.json';
 var settingData = jsonFile.readFileSync(fileName);
 
 // --- ip 설정
